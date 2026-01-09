@@ -2,7 +2,7 @@ import RecipeCard from './RecipeCard';
 function RecipeList({ recipes }) {
 return (
   <div>
-    <h1>Мои рецепты</h1>
+    <h1>My Recipes</h1>
     <div className="recipe-list">
     {recipes.map(r => (
   <RecipeCard 
