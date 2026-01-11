@@ -22,7 +22,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     }
   };
 
-  const recipeToEdit = recipes?.find(r => r.id === Number(id));
+  const recipeToEdit = recipes?.find(r => String(r.id) === String(id));
 
   useEffect(() => {
     if (isEdit && recipeToEdit) {
