@@ -15,7 +15,6 @@ function RecipeCard({ title, ingredients, time }) {
     return `${hours} h ${mins} min`;
   };
 
-
   return (
     <div className="recipe-card">
       <h2>{title}</h2>

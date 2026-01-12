@@ -85,7 +85,6 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     navigate('/recipes');
   };
 
-
   const resetForm = () => {
     setName('');
     setTime('');
