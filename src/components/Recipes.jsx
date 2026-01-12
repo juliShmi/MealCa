@@ -19,7 +19,11 @@ function Recipes() {
     );
   };
 
-  const addCategory = (category) => setCategories(prev => [...prev, category]);
+  const addCategory = (newCategory) => {
+    setCategories(prev =>
+      prev.includes(newCategory) ? prev : [...prev, newCategory]
+    );
+  };
 
   return (
     <div>
@@ -49,6 +53,7 @@ function Recipes() {
             <RecipeForm
               onCreate={addRecipe}
               categories={categories}
+              onAddCategory={addCategory}
             />
           }
         />
