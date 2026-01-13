@@ -2,9 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import Recipes from './components/Recipes';
 import Layout from './components/Layout';
-import Calendar from './components/Calendar'
+import CalendarPage from './pages/CalendarPage';
 
 function App() {
+  const [mealPlan, setMealPlan] = useState({});
   const [recipes, setRecipes] = useState([]);
   const [categories, setCategories] = useState(["Meat", "Fish / Seafood", "Pasta", "Soups", "Salads", "Snacks / Sandwiches", "Desserts / Sweets", "Vegetarian / Vegan", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Italian", "French", "Asian / Chinese / Japanese", "Mexican", "Home / Traditional"]);
 
@@ -38,7 +39,9 @@ function App() {
             onDelete={deleteRecipe}
             onAddCategory={addCategory}
           />} />
-          <Route path="/calendar" element={<Calendar />} />
+          <Route path="/calendar" element={<CalendarPage
+            mealPlan={mealPlan}
+            setMealPlan={setMealPlan} />} />
         </Route>
       </Routes>
     </>
