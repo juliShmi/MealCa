@@ -2,16 +2,20 @@ import MealSlot from "./MealSlot";
 
 const MEALS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-function Day({ date, meals = {} }) {
+function Day({ date, meals, onDropRecipe, recipes }) {
+  const safeMeals = meals ?? {};
   return (
-    <div style={{ border: '1px solid #ccc', marginBottom: '12px', padding: '8px' }}>
+    <div style={{ marginBottom: '20px' }}>
       <h3>{date}</h3>
 
       {MEALS.map(meal => (
         <MealSlot
           key={meal}
-          label={meal}
-          recipes={meals[meal] || []}
+          date={date}
+          meal={meal}
+          value={safeMeals[meal]}
+          onDropRecipe={onDropRecipe}
+          recipes={recipes}
         />
       ))}
     </div>
