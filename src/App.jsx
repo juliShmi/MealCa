@@ -41,7 +41,9 @@ function App() {
           />} />
           <Route path="/calendar" element={<CalendarPage
             mealPlan={mealPlan}
-            setMealPlan={setMealPlan} />} />
+            setMealPlan={setMealPlan}
+            recipes={recipes}
+            categories={categories} />} />
         </Route>
       </Routes>
     </>
