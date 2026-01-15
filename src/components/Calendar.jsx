@@ -1,13 +1,11 @@
 import Day from "./Day";
 
 function Calendar({ mealPlan, setMealPlan, recipes }) {
-  const safeMealPlan =
-    mealPlan && Object.keys(mealPlan).length > 0
-      ? mealPlan
-      : {
-        '2026-01-12': { breakfast: [], lunch: [], dinner: [], snack: [] },
-        '2026-01-13': { breakfast: [], lunch: [], dinner: [], snack: [] }
-      };
+  const safeMealPlan = {
+    '2026-01-12': mealPlan['2026-01-12'] ?? { breakfast: [], lunch: [], dinner: [], snack: [] },
+    '2026-01-13': mealPlan['2026-01-13'] ?? { breakfast: [], lunch: [], dinner: [], snack: [] },
+    ...mealPlan
+  };
 
   const handleDropRecipe = (date, meal, recipeId) => {
     setMealPlan(prev => {
