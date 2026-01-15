@@ -19,6 +19,9 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
       };
       const prevMeal = Array.isArray(prevDay[meal]) ? prevDay[meal] : [];
 
+      if (prevMeal.includes(recipeId)) {
+        return prev;
+      }
       return {
         ...prev,
         [date]: {
