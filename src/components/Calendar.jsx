@@ -32,6 +32,23 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
     });
   };
 
+  const handleRemoveRecipe = (date, meal, recipeId) => {
+    setMealPlan(prev => {
+      const prevDay = prev[date] ?? {
+        breakfast: [], lunch: [], dinner: [], snack: []
+      };
+      const prevMeal = Array.isArray(prevDay[meal]) ? prevDay[meal] : [];
+
+      return {
+        ...prev,
+        [date]: {
+          ...prevDay,
+          [meal]: prevMeal.filter(id => id !== recipeId),
+        },
+      };
+    });
+  };
+
   return (
     <div style={{ width: '50%' }}>
       {Object.keys(safeMealPlan).map(date => (
@@ -41,6 +58,7 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
           meals={mealPlan[date]}
           onDropRecipe={handleDropRecipe}
           recipes={recipes}
+          onRemoveRecipe={handleRemoveRecipe}
         />
       ))}
     </div>

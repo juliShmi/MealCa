@@ -7,7 +7,11 @@ function RecipeList({ recipes, categories, onDelete }) {
   return (
     <div>
       <h1>My Recipes</h1>
-      <div className="recipe-list">
+      <div className="recipe-list" style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+        gap: '20px'
+      }}>
         {categories.map((cat, idx) => {
           const filtered = recipes.filter(r => r.category === cat);
 

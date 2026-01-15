@@ -1,4 +1,4 @@
-function MealSlot({ date, meal, value, onDropRecipe, recipes }) {
+function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe }) {
   const items = Array.isArray(value) ? value : value ? [value] : [];
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -27,15 +27,32 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes }) {
         minHeight: '30px'
       }}
     >
-      <div style={{ fontWeight: 700, marginBottom: '6px' }}>{meal}</div>
+      <div style={{ fontWeight: 700, marginBottom: '10px' }}>{meal}</div>
       {items.length > 0 ? (
-        <div style={{ fontSize: '12px' }}>
+        <div style={{ fontSize: '16px' }}>
           {items.map((x, idx) => (
-            <div key={`${x}-${idx}`}>{resolveLabel(x)}</div>
+            <div key={`${x}-${idx}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                border: '1px solid #000',
+                borderRadius: '6px',
+                padding: '6px 10px',
+                marginBottom: '4px'
+              }}>
+              {resolveLabel(x)}
+              <button
+                onClick={() => onRemoveRecipe(date, meal, x)}
+                style={{ marginLeft: '10px', cursor: 'pointer' }}
+              >
+                ✕
+              </button></div>
+
           ))}
         </div>
       ) : (
-        <em>Empty</em>
+        <em>Add</em>
       )}
     </div>
   );
