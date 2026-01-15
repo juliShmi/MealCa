@@ -9,7 +9,20 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   const [categories, setCategories] = useState(["Meat", "Fish / Seafood", "Pasta", "Soups", "Salads", "Snacks / Sandwiches", "Desserts / Sweets", "Vegetarian / Vegan", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Italian", "French", "Asian / Chinese / Japanese", "Mexican", "Home / Traditional"]);
 
-  const deleteRecipe = (id) => setRecipes(prev => prev.filter(r => r.id !== id));
+  const deleteRecipe = (id) => {
+    setRecipes(prev => prev.filter(r => r.id !== id));
+    setMealPlan(prev => {
+      const cleaned = {};
+      Object.keys(prev).forEach(date => {
+        cleaned[date] = {};
+        ['breakfast', 'lunch', 'dinner', 'snack'].forEach(meal => {
+          const mealRecipes = prev[date]?.[meal] || [];
+          cleaned[date][meal] = mealRecipes.filter(recipeId => recipeId !== id);
+        });
+      });
+      return cleaned;
+    });
+  };
 
   const addRecipe = (recipe) => {
     setRecipes(prev => [...prev, recipe]);

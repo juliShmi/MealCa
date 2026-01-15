@@ -6,7 +6,7 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes }) {
 
   const resolveLabel = (id) => {
     const recipe = recipes?.find(r => r.id === id);
-    return recipe ? recipe.name : id;
+    return recipe.name;
   };
 
   const handleDrop = (e) => {
