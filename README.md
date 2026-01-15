@@ -1,4 +1,4 @@
-# MealCa
+# MealCa (MealCalendar)
 
 🚧 **Work in Progress**
 
