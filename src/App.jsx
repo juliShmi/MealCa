@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { mockRecipes } from './mockRecipes'
 import { useState } from 'react';
 import Recipes from './components/Recipes';
 import Layout from './components/Layout';
@@ -6,7 +7,7 @@ import CalendarPage from './pages/CalendarPage';
 
 function App() {
   const [mealPlan, setMealPlan] = useState({});
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState(mockRecipes);
   const [categories, setCategories] = useState(["Meat", "Fish / Seafood", "Pasta", "Soups", "Salads", "Snacks / Sandwiches", "Desserts / Sweets", "Vegetarian / Vegan", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Italian", "French", "Asian / Chinese / Japanese", "Mexican", "Home / Traditional"]);
 
   const deleteRecipe = (id) => {
