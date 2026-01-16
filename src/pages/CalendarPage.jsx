@@ -1,5 +1,5 @@
-import Calendar from "../components/Calendar";
-import RecipeLibrary from "../components/RecipeLibrary";
+import Calendar from "../components/calendar/Calendar";
+import RecipeLibrary from "../components/calendar/recipeLibrary/RecipeLibrary";
 
 function CalendarPage({ mealPlan, setMealPlan, recipes = [], categories = [] }) {
   return (<div style={{ display: 'flex' }}>
