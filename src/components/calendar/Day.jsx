@@ -2,7 +2,7 @@ import MealSlot from "./MealSlot";
 
 const MEALS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-function Day({ date, meals, onDropRecipe, recipes, onRemoveRecipe, onMoveRecipe }) {
+function Day({ date, meals, onDropRecipe, recipes, onRemoveRecipe, onMoveRecipe, variant }) {
   const safeMeals = meals ?? {};
 
   const d = new Date(`${date}T00:00:00Z`);
@@ -21,9 +21,19 @@ function Day({ date, meals, onDropRecipe, recipes, onRemoveRecipe, onMoveRecipe 
 
   const prettyDate = `${weekday}, ${fullDate}`;
 
+  const isWeekGrid = variant === 'weekGrid';
+
   return (
-    <div style={{ marginBottom: '20px' }}>
-      <h3>{prettyDate}</h3>
+    <div style={{ marginBottom: isWeekGrid ? 0 : '20px' }}>
+      <h3
+        style={{
+          margin: '0 0 10px 0',
+          overflowWrap: 'anywhere',
+          fontSize: isWeekGrid ? 14 : undefined,
+        }}
+      >
+        {prettyDate}
+      </h3>
 
       {MEALS.map(meal => (
         <MealSlot

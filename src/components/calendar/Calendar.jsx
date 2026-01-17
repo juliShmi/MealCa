@@ -7,7 +7,7 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
     [],
   );
   const baseDateStr = "2026-01-12";
-  const [view, setView] = useState("week"); // "day" | "3days" | "week"
+  const [view, setView] = useState("week");
 
   const formatDate = (d) => {
     const y = d.getUTCFullYear();
@@ -111,8 +111,13 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
     });
   };
 
+  // Layout:
+  // - day/3days: show days as columns (roomy cards)
+  // - week: show days in a 7-column grid (with horizontal scroll on small screens)
+  const isWeek = view === 'week';
+
   return (
-    <div style={{ width: '50%' }}>
+    <div style={{ width: '100%', minWidth: 0 }}>
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <button type="button" onClick={() => setView("day")}>
           1 day
@@ -125,17 +130,47 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
         </button>
       </div>
 
-      {visibleDates.map((date) => (
-        <Day
-          key={date}
-          date={date}
-          meals={safeMealPlan[date]}
-          onDropRecipe={handleDropRecipe}
-          recipes={recipes}
-          onRemoveRecipe={handleRemoveRecipe}
-          onMoveRecipe={handleMoveRecipe}
-        />
-      ))}
+      {isWeek ? (
+        <div style={{ overflowX: 'auto', paddingBottom: 8 }}>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(7, minmax(220px, 1fr))',
+              gap: 12,
+              minWidth: 7 * 220 + 6 * 12,
+            }}
+          >
+            {visibleDates.map((date) => (
+              <div key={date} style={{ minWidth: 0 }}>
+                <Day
+                  date={date}
+                  meals={safeMealPlan[date]}
+                  onDropRecipe={handleDropRecipe}
+                  recipes={recipes}
+                  onRemoveRecipe={handleRemoveRecipe}
+                  onMoveRecipe={handleMoveRecipe}
+                  variant="weekGrid"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          {visibleDates.map((date) => (
+            <div key={date} style={{ flex: '1 1 320px', minWidth: 0 }}>
+              <Day
+                date={date}
+                meals={safeMealPlan[date]}
+                onDropRecipe={handleDropRecipe}
+                recipes={recipes}
+                onRemoveRecipe={handleRemoveRecipe}
+                onMoveRecipe={handleMoveRecipe}
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

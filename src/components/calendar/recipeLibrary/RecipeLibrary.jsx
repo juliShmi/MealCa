@@ -4,9 +4,13 @@ function RecipeLibrary({ recipes, categories }) {
   return (
     <div
       style={{
-        width: '40%',
         padding: '16px',
         borderLeft: '1px solid #ccc',
+        // Prevent long content from pushing outside its column
+        minWidth: 0,
+        // Keep the library usable when calendar is tall
+        maxHeight: 'calc(100vh - 140px)',
+        overflowY: 'auto',
       }}
     >
       <h2>Recipes</h2>
