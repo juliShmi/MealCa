@@ -1,12 +1,37 @@
+import { useMemo, useState } from 'react';
+import RecipeModal from './RecipeModal';
+
 function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe, onMoveRecipe }) {
   const items = Array.isArray(value) ? value : value ? [value] : [];
-  const handleDragOver = (e) => {
-    e.preventDefault();
+
+  const recipesById = useMemo(() => {
+    const map = new Map();
+    (recipes ?? []).forEach((r) => map.set(String(r.id), r));
+    return map;
+  }, [recipes]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeRecipeId, setActiveRecipeId] = useState(null);
+
+  const activeRecipe = activeRecipeId ? recipesById.get(activeRecipeId) : null;
+
+  const openRecipe = (id) => {
+    setActiveRecipeId(String(id));
+    setIsModalOpen(true);
+  };
+
+  const closeRecipe = () => {
+    setIsModalOpen(false);
+    setActiveRecipeId(null);
   };
 
   const resolveLabel = (id) => {
-    const recipe = recipes?.find(r => r.id === id);
-    return recipe.name;
+    const recipe = recipesById.get(String(id));
+    return recipe?.name ?? String(id);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
   };
 
   const handleDrop = (e) => {
@@ -17,9 +42,12 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe, on
     const fromDate = e.dataTransfer.getData('fromDate');
     const fromMeal = e.dataTransfer.getData('fromMeal');
 
-    if (fromDate && fromMeal) {
+    if (fromDate && fromMeal && typeof onMoveRecipe === 'function') {
       onMoveRecipe(fromDate, fromMeal, date, meal, recipeId);
-    } else {
+      return;
+    }
+
+    if (typeof onDropRecipe === 'function') {
       onDropRecipe(date, meal, recipeId);
     }
   };
@@ -38,14 +66,16 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe, on
         border: '1px dashed #aaa',
         padding: '8px',
         marginBottom: '6px',
-        minHeight: '30px'
+        minHeight: '30px',
       }}
     >
       <div style={{ fontWeight: 700, marginBottom: '10px' }}>{meal}</div>
+
       {items.length > 0 ? (
         <div style={{ fontSize: '16px' }}>
           {items.map((x, idx) => (
-            <div key={`${x}-${idx}`}
+            <div
+              key={`${x}-${idx}`}
               draggable
               onDragStart={(e) => handleItemDragStart(e, x)}
               style={{
@@ -55,10 +85,22 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe, on
                 border: '1px solid #000',
                 borderRadius: '6px',
                 padding: '6px 10px',
-                marginBottom: '4px'
-              }}>
-              {resolveLabel(x)}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                marginBottom: '4px',
+              }}
+            >
+              <span>{resolveLabel(x)}</span>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => openRecipe(x)}
+                  style={{ cursor: 'pointer' }}
+                  aria-label="View recipe"
+                  title="View"
+                >
+                  👁️
+                </button>
+
                 <span
                   aria-hidden="true"
                   title="Drag to move"
@@ -66,8 +108,10 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe, on
                 >
                   ⋮⋮
                 </span>
+
                 <button
-                  onClick={() => onRemoveRecipe(date, meal, x)}
+                  type="button"
+                  onClick={() => onRemoveRecipe?.(date, meal, x)}
                   style={{ cursor: 'pointer' }}
                   aria-label="Remove from slot"
                   title="Remove"
@@ -76,13 +120,15 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, onRemoveRecipe, on
                 </button>
               </div>
             </div>
-
           ))}
         </div>
       ) : (
         <em>Add</em>
       )}
+
+      <RecipeModal isOpen={isModalOpen} recipe={activeRecipe} onClose={closeRecipe} />
     </div>
   );
 }
+
 export default MealSlot;
