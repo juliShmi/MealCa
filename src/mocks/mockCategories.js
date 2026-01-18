@@ -1,1 +1,23 @@
-export const mockCategories = ["Meat", "Fish / Seafood", "Pasta", "Soups", "Salads", "Snacks / Sandwiches", "Desserts / Sweets", "Vegetarian / Vegan", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Italian", "French", "Asian / Chinese / Japanese", "Mexican", "Home / Traditional"];
+export const UNCATEGORIZED = "Uncategorized";
+
+export const mockCategories = [
+  UNCATEGORIZED,
+  "Meat",
+  "Fish / Seafood",
+  "Pasta",
+  "Soups",
+  "Salads",
+  "Snacks / Sandwiches",
+  "Desserts / Sweets",
+  "Vegetarian / Vegan",
+  "Breakfast",
+  "Lunch",
+  "Dinner",
+  "Snack",
+  "Dessert",
+  "Italian",
+  "French",
+  "Asian / Chinese / Japanese",
+  "Mexican",
+  "Home / Traditional",
+];

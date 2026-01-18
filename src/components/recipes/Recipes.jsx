@@ -14,6 +14,9 @@ function Recipes({ recipes, categories, onCreate, onUpdate, onDelete, onAddCateg
         <Link to="/recipes/new" style={{ marginLeft: '10px' }}>
           <button>Add New Recipe</button>
         </Link>
+        <Link to="/categories" style={{ marginLeft: '10px' }}>
+          <button>Manage Categories</button>
+        </Link>
       </div>
 
       {/* nested routes */}

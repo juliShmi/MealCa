@@ -1,10 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { mockRecipes } from './mocks/mockRecipes'
-import { mockCategories } from './mocks/mockCategories'
+import { mockCategories, UNCATEGORIZED } from './mocks/mockCategories'
 import { useState } from 'react';
 import Layout from './components/Layout';
 import CalendarPage from './pages/CalendarPage';
 import RecipesPage from './pages/RecipesPage';
+import CategoriesPage from './pages/CategoriesPage';
 
 function App() {
   const [mealPlan, setMealPlan] = useState({});
@@ -26,6 +27,39 @@ function App() {
     });
   };
 
+  const addCategory = (newCategory) => {
+    const name = (newCategory ?? '').trim();
+    if (!name) return;
+    setCategories((prev) => (prev.includes(name) ? prev : [...prev, name]));
+  };
+
+  const deleteCategory = (categoryName) => {
+    if (categoryName === UNCATEGORIZED) return;
+
+    setCategories((prev) => prev.filter((c) => c !== categoryName));
+
+    // Variant A: remove category from recipes; if a recipe used only this category,
+    // it becomes Uncategorized so it doesn't "disappear".
+    setRecipes((prev) =>
+      prev.map((r) => {
+        // New model: categories: string[]
+        if (Array.isArray(r.categories)) {
+          const nextCats = r.categories.filter((c) => c !== categoryName);
+          return {
+            ...r,
+            categories: nextCats.length > 0 ? nextCats : [UNCATEGORIZED],
+          };
+        }
+
+        // Backward compatibility: old model category: string
+        return {
+          ...r,
+          category: r.category === categoryName ? UNCATEGORIZED : r.category,
+        };
+      }),
+    );
+  };
+
   return (
     <>
       <Routes>
@@ -39,6 +73,17 @@ function App() {
             onDelete={deleteRecipe} />
           }
           />}
+          <Route
+            path="/categories"
+            element={
+              <CategoriesPage
+                categories={categories}
+                onAddCategory={addCategory}
+                onDeleteCategory={deleteCategory}
+                uncategorized={UNCATEGORIZED}
+              />
+            }
+          />
           <Route path="/calendar" element={<CalendarPage
             mealPlan={mealPlan}
             setMealPlan={setMealPlan}

@@ -1,4 +1,3 @@
-// Mock recipes for initial data
 export const mockRecipes = [
   {
     id: 'mock-1',
