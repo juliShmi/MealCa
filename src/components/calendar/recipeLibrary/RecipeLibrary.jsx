@@ -6,9 +6,7 @@ function RecipeLibrary({ recipes, categories }) {
       style={{
         padding: '16px',
         borderLeft: '1px solid #ccc',
-        // Prevent long content from pushing outside its column
         minWidth: 0,
-        // Keep the library usable when calendar is tall
         maxHeight: 'calc(100vh - 140px)',
         overflowY: 'auto',
       }}
@@ -19,7 +17,7 @@ function RecipeLibrary({ recipes, categories }) {
         <CategoryAccordion
           key={cat}
           category={cat}
-          recipes={recipes.filter(r => r.category === cat)}
+          recipes={recipes.filter(r => (r.categories ?? []).includes(cat))}
         />
       ))}
     </div>

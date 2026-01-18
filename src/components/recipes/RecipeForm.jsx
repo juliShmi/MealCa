@@ -13,7 +13,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
   const [ingredients, setIngredients] = useState(['']);
-  const [category, setCategory] = useState(categories[0] || '');
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
 
   const handleAddCategory = () => {
@@ -31,7 +31,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
       setName(recipeToEdit.name);
       setTime(recipeToEdit.time);
       setIngredients(recipeToEdit.ingredients);
-      setCategory(recipeToEdit.category);
+      setSelectedCategories(recipeToEdit.categories ?? []);
     }
   }, [isEdit, recipeToEdit]);
 
@@ -70,9 +70,9 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     const recipe = {
       id: isEdit ? recipeToEdit.id : uuidv4(),
       name,
-      ingredients: ingredients.filter(i => i.trim() !== ''),
+      ingredients: ingredients.filter((i) => i.trim() !== ""),
       time: Number(time),
-      category,
+      categories: selectedCategories,
     };
 
     if (isEdit) {
@@ -158,14 +158,24 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
         </button>
       </div>
 
-      <div style={{ marginBottom: '12px' }}>
-        <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          {categories.map((cat, idx) => (
-            <option key={idx} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
+      <div style={{ marginBottom: 12 }}>
+        <p>Categories:</p>
+        {categories.map((cat) => (
+          <label key={cat} style={{ display: "block" }}>
+            <input
+              type="checkbox"
+              checked={selectedCategories.includes(cat)}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedCategories((prev) => [...prev, cat]);
+                } else {
+                  setSelectedCategories((prev) => prev.filter((x) => x !== cat));
+                }
+              }}
+            />
+            {cat}
+          </label>
+        ))}
       </div>
 
       <div style={{ marginBottom: '12px' }}>

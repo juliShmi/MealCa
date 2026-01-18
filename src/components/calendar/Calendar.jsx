@@ -111,9 +111,6 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
     });
   };
 
-  // Layout:
-  // - day/3days: show days as columns (roomy cards)
-  // - week: show days in a 7-column grid (with horizontal scroll on small screens)
   const isWeek = view === 'week';
 
   return (

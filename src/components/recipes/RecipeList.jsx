@@ -13,8 +13,7 @@ function RecipeList({ recipes, categories, onDelete }) {
         gap: '20px'
       }}>
         {categories.map((cat, idx) => {
-          const filtered = recipes.filter(r => r.category === cat);
-
+          const filtered = recipes.filter(r => (r.categories ?? []).includes(cat));
           if (filtered.length === 0) return null;
 
           return (
