@@ -1,9 +1,19 @@
 import RecipeCard from './RecipeCard';
 import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 
 
 function RecipeList({ recipes, categories, onDelete }) {
   const navigate = useNavigate();
+  const [openByCategory, setOpenByCategory] = useState(() => ({}));
+
+  const categoriesWithCounts = useMemo(() => {
+    return categories.map((cat) => ({
+      cat,
+      recipes: recipes.filter((r) => (r.categories ?? []).includes(cat)),
+    }));
+  }, [categories, recipes]);
+
   return (
     <div>
       <h1>My Recipes</h1>
@@ -12,31 +22,64 @@ function RecipeList({ recipes, categories, onDelete }) {
         gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
         gap: '20px'
       }}>
-        {categories.map((cat, idx) => {
-          const filtered = recipes.filter(r => (r.categories ?? []).includes(cat));
+        {categoriesWithCounts.map(({ cat, recipes: filtered }, idx) => {
           if (filtered.length === 0) return null;
+
+          const isOpen = openByCategory[cat] ?? false;
 
           return (
             <div key={idx} style={{ marginBottom: '20px' }}>
-              <h2>{cat}</h2>
-              {filtered.map((r) => (
-                <div key={r.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                  <RecipeCard
-                    title={r.name}
-                    time={r.time}
-                    ingredients={r.ingredients}
-                  />
-                  <button onClick={() => navigate(`/recipes/edit/${r.id}`)}>
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => onDelete(r.id)}
-                    style={{ marginLeft: '10px', height: '30px' }}
-                  >
-                    🗑️
-                  </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenByCategory((prev) => ({
+                    ...prev,
+                    [cat]: !(prev[cat] ?? true),
+                  }))
+                }
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: '10px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: 10,
+                  background: '#fff',
+                  cursor: 'pointer',
+                }}
+                aria-expanded={isOpen}
+              >
+                <span style={{ fontWeight: 800 }}>{cat}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ opacity: 0.7, fontSize: 12 }}>{filtered.length}</span>
+                  <span aria-hidden="true">{isOpen ? '▾' : '▸'}</span>
+                </span>
+              </button>
+
+              {isOpen && (
+                <div style={{ marginTop: 10 }}>
+                  {filtered.map((r) => (
+                    <div key={r.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+                      <RecipeCard
+                        title={r.name}
+                        time={r.time}
+                        ingredients={r.ingredients}
+                      />
+                      <button onClick={() => navigate(`/recipes/edit/${r.id}`)}>
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => onDelete(r.id)}
+                        style={{ marginLeft: '10px', height: '30px' }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           );
         })}
