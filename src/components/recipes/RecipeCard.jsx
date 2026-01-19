@@ -1,4 +1,4 @@
-function RecipeCard({ title, ingredients, time }) {
+function RecipeCard({ title, ingredients, time, actions }) {
 
   const formatTime = (minutes) => {
     const hours = Math.floor(minutes / 60);
@@ -17,9 +17,31 @@ function RecipeCard({ title, ingredients, time }) {
 
   return (
     <div className="recipe-card">
-      <h2>{title}</h2>
-      <p><strong>Ingredients:</strong> {ingredients.join(', ')}</p>
-      <p><strong>Time:</strong> {formatTime(time)}</p>
+      {(title || actions) && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          {title && <h2 style={{ margin: 0 }}>{title}</h2>}
+          {actions && <div>{actions}</div>}
+        </div>
+      )}
+
+      {Array.isArray(ingredients) && ingredients.length > 0 && (
+        <p>
+          <strong>Ingredients:</strong> {ingredients.join(', ')}
+        </p>
+      )}
+
+      {time != null && !Number.isNaN(Number(time)) && (
+        <p>
+          <strong>Time:</strong> {formatTime(Number(time))}
+        </p>
+      )}
     </div>
   );
 }

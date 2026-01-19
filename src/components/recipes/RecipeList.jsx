@@ -61,21 +61,22 @@ function RecipeList({ recipes, categories, onDelete }) {
               {isOpen && (
                 <div style={{ marginTop: 10 }}>
                   {filtered.map((r) => (
-                    <div key={r.id} style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
+                    <div key={r.id} style={{ marginBottom: '10px' }}>
                       <RecipeCard
                         title={r.name}
                         time={r.time}
                         ingredients={r.ingredients}
+                        actions={
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <button onClick={() => navigate(`/recipes/edit/${r.id}`)}>
+                              ✏️
+                            </button>
+                            <button onClick={() => onDelete(r.id)}>
+                              🗑️
+                            </button>
+                          </div>
+                        }
                       />
-                      <button onClick={() => navigate(`/recipes/edit/${r.id}`)}>
-                        ✏️
-                      </button>
-                      <button
-                        onClick={() => onDelete(r.id)}
-                        style={{ marginLeft: '10px', height: '30px' }}
-                      >
-                        🗑️
-                      </button>
                     </div>
                   ))}
                 </div>
