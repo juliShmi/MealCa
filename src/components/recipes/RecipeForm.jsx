@@ -13,15 +13,22 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
   const [ingredients, setIngredients] = useState(['']);
+  const [steps, setSteps] = useState(['']);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
 
   const handleAddCategory = () => {
-    if (newCategory.trim() && !categories.includes(newCategory)) {
-      onAddCategory(newCategory.trim());
-      setCategory(newCategory.trim());
+    const trimmed = newCategory.trim();
+    if (!trimmed) return;
+    if (categories.includes(trimmed)) {
+      setSelectedCategories((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
       setNewCategory('');
+      return;
     }
+
+    onAddCategory?.(trimmed);
+    setSelectedCategories((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]));
+    setNewCategory('');
   };
 
   const recipeToEdit = recipes?.find(r => String(r.id) === String(id));
@@ -31,6 +38,11 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
       setName(recipeToEdit.name);
       setTime(recipeToEdit.time);
       setIngredients(recipeToEdit.ingredients);
+      const initialSteps =
+        Array.isArray(recipeToEdit.steps) && recipeToEdit.steps.length > 0
+          ? recipeToEdit.steps
+          : [''];
+      setSteps(initialSteps);
       setSelectedCategories(recipeToEdit.categories ?? []);
     }
   }, [isEdit, recipeToEdit]);
@@ -71,6 +83,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
       id: isEdit ? recipeToEdit.id : uuidv4(),
       name,
       ingredients: ingredients.filter((i) => i.trim() !== ""),
+      steps: steps.filter((s) => s.trim() !== ""),
       time: Number(time),
       categories: selectedCategories,
     };
@@ -89,6 +102,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     setName('');
     setTime('');
     setIngredients(['']);
+    setSteps(['']);
   };
 
   const addIngredient = () => {
@@ -99,6 +113,23 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     const newIngredients = [...ingredients];
     newIngredients[index] = value;
     setIngredients(newIngredients);
+  };
+
+  const addStep = () => {
+    setSteps([...steps, '']);
+  };
+
+  const handleStepChange = (index, value) => {
+    const next = [...steps];
+    next[index] = value;
+    setSteps(next);
+  };
+
+  const removeStep = (index) => {
+    setSteps((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      return next.length > 0 ? next : [''];
+    });
   };
 
   return (
@@ -154,6 +185,36 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
           </p>
         )}
         <button type="button" onClick={addIngredient} style={{ marginTop: '5px' }}>
+          +
+        </button>
+      </div>
+
+      <div style={{ marginBottom: '12px' }}>
+        <p>Steps:</p>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '5px',
+            maxWidth: '300px',
+          }}
+        >
+          {steps.map((step, index) => (
+            <div key={index} style={{ display: 'flex', gap: 6 }}>
+              <input
+                type="text"
+                placeholder={`Step ${index + 1}`}
+                value={step}
+                onChange={(e) => handleStepChange(index, e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <button type="button" onClick={() => removeStep(index)}>
+                −
+              </button>
+            </div>
+          ))}
+        </div>
+        <button type="button" onClick={addStep} style={{ marginTop: '5px' }}>
           +
         </button>
       </div>

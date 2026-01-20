@@ -3,6 +3,7 @@ export const mockRecipes = [
     id: 'mock-1',
     name: 'Spaghetti Carbonara',
     ingredients: ['spaghetti', 'eggs', 'bacon', 'parmesan cheese', 'black pepper'],
+    steps: ['Boil spaghetti in salted water until al dente.', 'Whisk eggs with grated cheese and black pepper.', 'Fry bacon/pancetta until crisp.', 'Combine hot pasta with bacon, remove from heat, then mix in egg-cheese mixture quickly.'],
     time: 30,
     categories: ['Pasta', 'Italian']
   },
@@ -10,6 +11,7 @@ export const mockRecipes = [
     id: 'mock-2',
     name: 'Caesar Salad',
     ingredients: ['romaine lettuce', 'caesar dressing', 'parmesan cheese', 'croutons', 'lemon'],
+    steps: ['Wash and chop romaine lettuce.', 'Add dressing, parmesan, and croutons. Toss well.'],
     time: 15,
     categories: ['Salads']
   },
@@ -17,6 +19,7 @@ export const mockRecipes = [
     id: 'mock-3',
     name: 'Chicken Curry',
     ingredients: ['chicken breast', 'curry powder', 'coconut milk', 'onion', 'garlic', 'ginger'],
+    steps: ['Cut chicken into small pieces.', 'Add curry powder, coconut milk, onion, garlic, and ginger to a pot and bring to a boil.', 'Simmer for 20 minutes.', 'Serve with rice.'],
     time: 45,
     categories: ['Meat']
   },
@@ -24,6 +27,7 @@ export const mockRecipes = [
     id: 'mock-4',
     name: 'Chocolate Chip Cookies',
     ingredients: ['flour', 'butter', 'sugar', 'chocolate chips', 'eggs', 'vanilla extract'],
+    steps: ['Preheat oven to 350°F (175°C).', 'Mix flour, butter, sugar, chocolate chips, eggs, and vanilla extract in a bowl.', 'Roll into small balls and place on a baking sheet.', 'Bake for 10 minutes.', 'Serve with ice cream.'],
     time: 25,
     categories: ['Desserts / Sweets', 'Home / Traditional']
   }
