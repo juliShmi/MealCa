@@ -6,8 +6,6 @@ function CategoriesPage({ categories, onAddCategory, onDeleteCategory, uncategor
   const location = useLocation();
 
   const handleBack = () => {
-    // If this page was opened directly, location.key is usually "default".
-    // In that case, go to a safe fallback route instead of navigate(-1).
     if (location.key === "default") {
       navigate("/recipes", { replace: true });
       return;
