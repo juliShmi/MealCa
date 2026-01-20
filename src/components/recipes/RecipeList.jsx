@@ -34,7 +34,7 @@ function RecipeList({ recipes, categories, onDelete }) {
                 onClick={() =>
                   setOpenByCategory((prev) => ({
                     ...prev,
-                    [cat]: !(prev[cat] ?? true),
+                    [cat]: !(prev[cat] ?? false),
                   }))
                 }
                 style={{
