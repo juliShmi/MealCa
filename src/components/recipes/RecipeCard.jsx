@@ -1,4 +1,19 @@
-function RecipeCard({ title, ingredients, time, actions }) {
+import { useEffect, useState } from 'react';
+
+function RecipeCard({ title, ingredients, time, steps, actions, onStepsChange }) {
+  const isStepsEditable = typeof onStepsChange === 'function';
+  const [newStep, setNewStep] = useState('');
+  const [editingIdx, setEditingIdx] = useState(null);
+  const [editingValue, setEditingValue] = useState('');
+
+  useEffect(() => {
+    if (!isStepsEditable) return;
+    if (editingIdx == null) return;
+    if (!Array.isArray(steps) || editingIdx < 0 || editingIdx >= steps.length) {
+      setEditingIdx(null);
+      setEditingValue('');
+    }
+  }, [editingIdx, steps, isStepsEditable]);
 
   const formatTime = (minutes) => {
     const hours = Math.floor(minutes / 60);
@@ -36,6 +51,110 @@ function RecipeCard({ title, ingredients, time, actions }) {
           <strong>Ingredients:</strong> {ingredients.join(', ')}
         </p>
       )}
+
+      <div>
+        <strong>Steps:</strong>
+
+        {Array.isArray(steps) && steps.length > 0 ? (
+          <ol style={{ marginTop: 8, marginBottom: 8, paddingLeft: 18 }}>
+            {steps.map((s, idx) => (
+              <li key={idx} style={{ marginBottom: 6 }}>
+                {isStepsEditable && editingIdx === idx ? (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      value={editingValue}
+                      onChange={(e) => setEditingValue(e.target.value)}
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next = steps.slice();
+                        const trimmed = editingValue.trim();
+                        if (!trimmed) return;
+                        next[idx] = trimmed;
+                        onStepsChange?.(next);
+                        setEditingIdx(null);
+                        setEditingValue('');
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingIdx(null);
+                        setEditingValue('');
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                    <span style={{ flex: 1 }}>{s}</span>
+                    {isStepsEditable && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingIdx(idx);
+                            setEditingValue(String(s ?? ''));
+                          }}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = steps.filter((_, i) => i !== idx);
+                            onStepsChange?.(next);
+                            if (editingIdx === idx) {
+                              setEditingIdx(null);
+                              setEditingValue('');
+                            }
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div style={{ opacity: 0.7, marginTop: 6, marginBottom: 8 }}>
+            No steps yet.
+          </div>
+        )}
+
+        {isStepsEditable && (
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              type="text"
+              placeholder="Add a step"
+              value={newStep}
+              onChange={(e) => setNewStep(e.target.value)}
+              style={{ flex: 1 }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const trimmed = newStep.trim();
+                if (!trimmed) return;
+                const next = Array.isArray(steps) ? [...steps, trimmed] : [trimmed];
+                onStepsChange?.(next);
+                setNewStep('');
+              }}
+            >
+              Add
+            </button>
+          </div>
+        )}
+      </div>
 
       {time != null && !Number.isNaN(Number(time)) && (
         <p>

@@ -66,6 +66,7 @@ function RecipeList({ recipes, categories, onDelete }) {
                         title={r.name}
                         time={r.time}
                         ingredients={r.ingredients}
+                        steps={r.steps}
                         actions={
                           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                             <button onClick={() => navigate(`/recipes/edit/${r.id}`)}>

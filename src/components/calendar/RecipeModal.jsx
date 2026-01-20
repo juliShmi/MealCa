@@ -65,6 +65,17 @@ function RecipeModal({ isOpen, recipe, onClose }) {
             ))}
           </ul>
         </div>
+
+        {Array.isArray(recipe.steps) && recipe.steps.length > 0 && (
+          <div style={{ marginTop: 14 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Steps</div>
+            <ol style={{ margin: 0, paddingLeft: 18 }}>
+              {recipe.steps.map((step, idx) => (
+                <li key={idx}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        )}
       </div>
     </div>
   );
