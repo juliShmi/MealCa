@@ -1,4 +1,4 @@
-function RecipeLibraryItem({ recipe }) {
+function RecipeLibraryItem({ recipe, onSelect }) {
   const handleDragStart = (e) => {
     e.dataTransfer.setData('recipeId', recipe.id);
   };
@@ -7,11 +7,13 @@ function RecipeLibraryItem({ recipe }) {
     <div
       draggable
       onDragStart={handleDragStart}
+      onClick={() => onSelect?.(recipe)}
       style={{
         border: '1px solid #ccc',
         padding: '6px',
         marginBottom: '4px',
-        cursor: 'grab'
+        cursor: 'grab',
+        userSelect: 'none',
       }}
     >
       {recipe.name}

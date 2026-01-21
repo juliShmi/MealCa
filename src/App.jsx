@@ -1,11 +1,12 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { mockRecipes } from './mocks/mockRecipes'
-import { mockCategories } from './mocks/mockCategories'
+import { mockCategories, UNCATEGORIZED } from './mocks/mockCategories'
 import { mockUsers } from './mocks/mockUsers'
 import { useState } from 'react';
 import Layout from './components/Layout';
 import CalendarPage from './pages/CalendarPage';
 import RecipesPage from './pages/RecipesPage';
+import CategoriesPage from './pages/CategoriesPage';
 import UserPage from './pages/UserPage';
 
 function App() {
@@ -29,6 +30,38 @@ function App() {
     });
   };
 
+  const addCategory = (newCategory) => {
+    const name = (newCategory ?? '').trim();
+    if (!name) return;
+    setCategories((prev) => (prev.includes(name) ? prev : [...prev, name]));
+  };
+
+  const deleteCategory = (categoryName) => {
+    if (!categoryName || categoryName === UNCATEGORIZED) return;
+
+    setCategories((prev) => prev.filter((c) => c !== categoryName));
+
+    // Remove the deleted category from recipes.
+    // If recipe becomes uncategorized -> assign UNCATEGORIZED so it doesn't disappear from UI.
+    setRecipes((prev) =>
+      prev.map((r) => {
+        if (Array.isArray(r.categories)) {
+          const nextCats = r.categories.filter((c) => c !== categoryName);
+          return {
+            ...r,
+            categories: nextCats.length > 0 ? nextCats : [UNCATEGORIZED],
+          };
+        }
+
+        // Backward compatibility: old model category: string
+        return {
+          ...r,
+          category: r.category === categoryName ? UNCATEGORIZED : r.category,
+        };
+      }),
+    );
+  };
+
   return (
     <>
       <Routes>
@@ -49,6 +82,17 @@ function App() {
             setMealPlan={setMealPlan}
             recipes={recipes}
             categories={categories} />} />
+          <Route
+            path="/categories"
+            element={
+              <CategoriesPage
+                categories={categories}
+                onAddCategory={addCategory}
+                onDeleteCategory={deleteCategory}
+                uncategorized={UNCATEGORIZED}
+              />
+            }
+          />
           <Route path="/user" element={<UserPage user={currentUser} />} />
         </Route>
       </Routes>
