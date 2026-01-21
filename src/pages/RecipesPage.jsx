@@ -1,9 +1,13 @@
 import Recipes from "../components/recipes/Recipes";
 
-function RecipesPage({ recipes, setRecipes, categories, setCategories, onDelete }) {
+function RecipesPage({ recipes, setRecipes, categories, setCategories, onDelete, currentUser }) {
 
   const addRecipe = (recipe) => {
-    setRecipes(prev => [...prev, recipe]);
+    const authorId = currentUser?.id;
+    setRecipes(prev => [
+      ...prev,
+      authorId ? { ...recipe, authorId } : recipe,
+    ]);
   };
 
   const updateRecipe = (updatedRecipe) => {

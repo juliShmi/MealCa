@@ -1,10 +1,10 @@
 import { Outlet } from 'react-router-dom';
 import Headers from './Headers';
 
-function Layout() {
+function Layout({ currentUser }) {
   return (
     <>
-      <Headers />
+      <Headers currentUser={currentUser} />
       <main>
         <Outlet />
       </main>
