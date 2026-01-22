@@ -95,7 +95,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
       resetForm();
     }
 
-    navigate('/recipes');
+    navigate(`/recipes?selected=${encodeURIComponent(String(recipe.id))}`);
   };
 
   const resetForm = () => {
