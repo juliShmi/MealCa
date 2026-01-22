@@ -1,7 +1,24 @@
 import RecipeCard from "./RecipeCard";
+import { useEffect, useRef, useState } from "react";
 
 function ActiveRecipe({ recipe, onClose, onEdit, onDelete }) {
   if (!recipe) return null;
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const onPointerDown = (e) => {
+      if (!menuRef.current) return;
+      if (menuRef.current.contains(e.target)) return;
+      setIsMenuOpen(false);
+    };
+
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [isMenuOpen]);
 
   return (
     <aside
@@ -49,33 +66,108 @@ function ActiveRecipe({ recipe, onClose, onEdit, onDelete }) {
           >
             {recipe.name}
           </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flex: "0 0 auto" }}>
-            <button type="button" onClick={onEdit} title="Edit">
-              ✏️
-            </button>
-            <button type="button" onClick={onDelete} title="Delete">
-              🗑️
-            </button>
-          </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close recipe"
-          title="Close"
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 999,
-            border: "1px solid #ddd",
-            background: "#fff",
-            cursor: "pointer",
-          }}
-        >
-          ✕
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative" }} ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((v) => !v)}
+            aria-label="Recipe actions"
+            title="Actions"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              border: "1px solid #ddd",
+              background: "#fff",
+              cursor: "pointer",
+              lineHeight: 1,
+              fontSize: 18,
+            }}
+          >
+            ⋯
+          </button>
+
+          {isMenuOpen && (
+            <div
+              role="menu"
+              aria-label="Recipe actions menu"
+              style={{
+                position: "absolute",
+                top: 36,
+                right: 0,
+                minWidth: 140,
+                background: "#fff",
+                border: "1px solid #ddd",
+                borderRadius: 10,
+                boxShadow: "0 10px 30px rgba(0,0,0,0.12)",
+                padding: 6,
+                zIndex: 5,
+              }}
+            >
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onEdit?.();
+                }}
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                }}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onDelete?.();
+                }}
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "8px 10px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                  color: "#b00020",
+                  fontWeight: 700,
+                }}
+              >
+                Delete
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsMenuOpen(false);
+              onClose?.();
+            }}
+            aria-label="Close recipe"
+            title="Close"
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 999,
+              border: "1px solid #ddd",
+              background: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            ✕
+          </button>
+        </div>
       </div>
 
       <div style={{ padding: 12 }}>
