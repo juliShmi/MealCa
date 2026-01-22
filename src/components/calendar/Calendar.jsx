@@ -1,7 +1,7 @@
 import Day from "./Day";
 import { useMemo, useState } from "react";
 
-function Calendar({ mealPlan, setMealPlan, recipes }) {
+function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
   const EMPTY_DAY = useMemo(
     () => ({ breakfast: [], lunch: [], dinner: [], snack: [] }),
     [],
@@ -144,6 +144,7 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
                   meals={safeMealPlan[date]}
                   onDropRecipe={handleDropRecipe}
                   recipes={recipes}
+                  stickers={stickers}
                   onRemoveRecipe={handleRemoveRecipe}
                   onMoveRecipe={handleMoveRecipe}
                   variant="weekGrid"
@@ -161,6 +162,7 @@ function Calendar({ mealPlan, setMealPlan, recipes }) {
                 meals={safeMealPlan[date]}
                 onDropRecipe={handleDropRecipe}
                 recipes={recipes}
+                stickers={stickers}
                 onRemoveRecipe={handleRemoveRecipe}
                 onMoveRecipe={handleMoveRecipe}
               />

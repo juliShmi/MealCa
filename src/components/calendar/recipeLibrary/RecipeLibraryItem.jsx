@@ -1,6 +1,7 @@
 function RecipeLibraryItem({ recipe, onSelect }) {
   const handleDragStart = (e) => {
     e.dataTransfer.setData('recipeId', recipe.id);
+    e.dataTransfer.setData('itemToken', `recipe:${recipe.id}`);
   };
 
   return (
