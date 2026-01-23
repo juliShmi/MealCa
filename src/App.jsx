@@ -8,6 +8,7 @@ import { mockSavedRecipes } from './mocks/mockSavedRecipes'
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Layout from './components/Layout';
+import Toast from './components/Toast';
 import CalendarPage from './pages/CalendarPage';
 import RecipesPage from './pages/RecipesPage';
 import CategoriesPage from './pages/CategoriesPage';
@@ -25,6 +26,11 @@ function App() {
   const [friendships] = useState(mockFriendships);
   const [savedRecipes, setSavedRecipes] = useState(mockSavedRecipes);
   const [currentUser] = useState(() => mockUsers[0]);
+  const [toast, setToast] = useState(null);
+
+  const showToast = (message) => {
+    setToast({ message, key: Date.now() });
+  };
 
   const mySavedRecipes = savedRecipes.filter((sr) => String(sr.ownerId) === String(currentUser.id));
   const categoriesWithSaved = mySavedRecipes.length > 0 && !categories.includes(SAVED_CATEGORY)
@@ -167,6 +173,7 @@ function App() {
 
   return (
     <>
+      <Toast toast={toast} onClose={() => setToast(null)} />
       <Routes>
         <Route element={<Layout currentUser={currentUser} />}>
           <Route path="/" element={<Navigate to="/recipes" />} />
@@ -231,6 +238,7 @@ function App() {
                   const sourceAuthorId = String(friendUser?.id ?? recipe.authorId);
                   const sourceRecipeId = String(recipe.id);
 
+                  let didAdd = false;
                   setSavedRecipes((prev) => {
                     const already = prev.some(
                       (sr) =>
@@ -248,6 +256,7 @@ function App() {
                       categories: recipe.categories ?? [],
                     };
 
+                    didAdd = true;
                     return [
                       ...prev,
                       {
@@ -261,6 +270,12 @@ function App() {
                       },
                     ];
                   });
+
+                  if (didAdd) {
+                    showToast('Recipe saved to your list');
+                  } else {
+                    showToast('This recipe is already in your Saved');
+                  }
                 }}
               />
             }
