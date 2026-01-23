@@ -12,6 +12,7 @@ function CalendarPage({
   onCreateSticker,
   onUpdateSticker,
   onDeleteSticker,
+  onToast,
 }) {
   const [isLibraryCollapsed, setIsLibraryCollapsed] = useState(true);
   const libraryWidth = isLibraryCollapsed ? 44 : 360;
@@ -28,7 +29,13 @@ function CalendarPage({
       }}
     >
       <div style={{ flex: '1 1 520px', minWidth: 0 }}>
-        <Calendar mealPlan={mealPlan} setMealPlan={setMealPlan} recipes={recipes} stickers={stickers} />
+        <Calendar
+          mealPlan={mealPlan}
+          setMealPlan={setMealPlan}
+          recipes={recipes}
+          stickers={stickers}
+          onToast={onToast}
+        />
       </div>
 
       <div

@@ -1,7 +1,7 @@
 import Day from "./Day";
 import { useMemo, useState } from "react";
 
-function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
+function Calendar({ mealPlan, setMealPlan, recipes, stickers, onToast }) {
   const EMPTY_DAY = useMemo(
     () => ({ breakfast: [], lunch: [], dinner: [], snack: [] }),
     [],
@@ -36,6 +36,7 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
   }, [mealPlan, visibleDates, EMPTY_DAY]);
 
   const handleDropRecipe = (date, meal, recipeId) => {
+    let didDuplicate = false;
     setMealPlan(prev => {
       const prevDay = prev[date] ?? {
         breakfast: [],
@@ -46,6 +47,7 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
       const prevMeal = Array.isArray(prevDay[meal]) ? prevDay[meal] : [];
 
       if (prevMeal.includes(recipeId)) {
+        didDuplicate = true;
         return prev;
       }
       return {
@@ -56,6 +58,9 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
         },
       };
     });
+    if (didDuplicate) {
+      onToast?.("Already added to this meal");
+    }
   };
 
   const handleRemoveRecipe = (date, meal, recipeId) => {
@@ -78,6 +83,7 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
   const handleMoveRecipe = (fromDate, fromMeal, toDate, toMeal, recipeId) => {
     if (fromDate === toDate && fromMeal === toMeal) return;
 
+    let didDuplicate = false;
     setMealPlan((prev) => {
       const emptyDay = { breakfast: [], lunch: [], dinner: [], snack: [] };
       const fromDay = prev[fromDate] ?? emptyDay;
@@ -86,9 +92,14 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
       const fromArr = Array.isArray(fromDay[fromMeal]) ? fromDay[fromMeal] : [];
       const toArr = Array.isArray(toDay[toMeal]) ? toDay[toMeal] : [];
 
-      const nextFromArr = fromArr.filter((id) => String(id) !== String(recipeId));
       const alreadyInTarget = toArr.some((id) => String(id) === String(recipeId));
-      const nextToArr = alreadyInTarget ? toArr : [...toArr, recipeId];
+      if (alreadyInTarget) {
+        didDuplicate = true;
+        return prev;
+      }
+
+      const nextFromArr = fromArr.filter((id) => String(id) !== String(recipeId));
+      const nextToArr = [...toArr, recipeId];
 
       if (String(fromDate) === String(toDate)) {
         const mergedDay = {
@@ -109,6 +120,9 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
         [toDate]: { ...toDay, [toMeal]: nextToArr },
       };
     });
+    if (didDuplicate) {
+      onToast?.("Already added to this meal");
+    }
   };
 
   const isWeek = view === 'week';
@@ -147,6 +161,7 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
                   stickers={stickers}
                   onRemoveRecipe={handleRemoveRecipe}
                   onMoveRecipe={handleMoveRecipe}
+                  onToast={onToast}
                   variant="weekGrid"
                 />
               </div>
@@ -165,6 +180,7 @@ function Calendar({ mealPlan, setMealPlan, recipes, stickers }) {
                 stickers={stickers}
                 onRemoveRecipe={handleRemoveRecipe}
                 onMoveRecipe={handleMoveRecipe}
+                onToast={onToast}
               />
             </div>
           ))}

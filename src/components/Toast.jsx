@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-function Toast({ toast, onClose, durationMs = 2500 }) {
+function Toast({ toast, onClose, durationMs = 2000 }) {
   useEffect(() => {
     if (!toast?.message) return;
     const t = setTimeout(() => onClose?.(), durationMs);

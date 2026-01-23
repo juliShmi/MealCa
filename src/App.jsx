@@ -201,6 +201,7 @@ function App() {
             onCreateSticker={addSticker}
             onUpdateSticker={updateSticker}
             onDeleteSticker={deleteSticker}
+            onToast={showToast}
           />} />
           <Route
             path="/categories"

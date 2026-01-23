@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import RecipeModal from './RecipeModal';
 
-function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemoveRecipe, onMoveRecipe }) {
+function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemoveRecipe, onMoveRecipe, onToast }) {
   const items = Array.isArray(value) ? value : value ? [value] : [];
 
   const recipesById = useMemo(() => {
@@ -39,6 +39,13 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemove
     return { type: 'recipe', id: s }; // backward compatibility
   };
 
+  const normalizeToken = (token) => {
+    const s = String(token);
+    if (s.startsWith('note:')) return `sticker:${s.slice('note:'.length)}`;
+    if (s.startsWith('sticker:') || s.startsWith('recipe:')) return s;
+    return `recipe:${s}`;
+  };
+
   const resolveLabel = (token) => {
     const { type, id } = parseToken(token);
     if (type === 'sticker') {
@@ -51,6 +58,13 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemove
 
   const handleDragOver = (e) => {
     e.preventDefault();
+    const itemToken = e.dataTransfer.getData('itemToken');
+    const recipeId = e.dataTransfer.getData('recipeId');
+    const incoming = itemToken || (recipeId ? `recipe:${recipeId}` : '');
+    if (!incoming) return;
+    const incomingNorm = normalizeToken(incoming);
+    const hasDup = items.some((t) => normalizeToken(t) === incomingNorm);
+    e.dataTransfer.dropEffect = hasDup ? 'none' : 'move';
   };
 
   const handleDrop = (e) => {
@@ -59,6 +73,13 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemove
     const recipeId = e.dataTransfer.getData('recipeId');
     const incoming = itemToken || (recipeId ? `recipe:${recipeId}` : '');
     if (!incoming) return;
+
+    const incomingNorm = normalizeToken(incoming);
+    const hasDup = items.some((t) => normalizeToken(t) === incomingNorm);
+    if (hasDup) {
+      onToast?.('Already added to this meal');
+      return;
+    }
 
     const fromDate = e.dataTransfer.getData('fromDate');
     const fromMeal = e.dataTransfer.getData('fromMeal');
@@ -91,7 +112,13 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemove
         minHeight: '30px',
       }}
     >
-      <div style={{ fontWeight: 700, marginBottom: '10px' }}>{meal}</div>
+      <div
+        style={{ fontWeight: 700, marginBottom: '10px' }}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        {meal}
+      </div>
 
       {items.length > 0 ? (
         <div style={{ fontSize: '16px' }}>
@@ -161,7 +188,7 @@ function MealSlot({ date, meal, value, onDropRecipe, recipes, stickers, onRemove
           ))}
         </div>
       ) : (
-        <em>Add</em>
+        <em onDragOver={handleDragOver} onDrop={handleDrop}>Add</em>
       )}
 
       <RecipeModal isOpen={isModalOpen} recipe={activeRecipe} onClose={closeRecipe} />

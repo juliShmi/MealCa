@@ -2,7 +2,7 @@ import MealSlot from "./MealSlot";
 
 const MEALS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-function Day({ date, meals, onDropRecipe, recipes, stickers, onRemoveRecipe, onMoveRecipe, variant }) {
+function Day({ date, meals, onDropRecipe, recipes, stickers, onRemoveRecipe, onMoveRecipe, variant, onToast }) {
   const safeMeals = meals ?? {};
 
   const d = new Date(`${date}T00:00:00Z`);
@@ -46,6 +46,7 @@ function Day({ date, meals, onDropRecipe, recipes, stickers, onRemoveRecipe, onM
           stickers={stickers}
           onRemoveRecipe={onRemoveRecipe}
           onMoveRecipe={onMoveRecipe}
+          onToast={onToast}
         />
       ))}
     </div>
