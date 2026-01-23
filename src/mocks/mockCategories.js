@@ -13,11 +13,9 @@ export const mockCategories = [
   "Breakfast",
   "Lunch",
   "Dinner",
-  "Snack",
-  "Dessert",
   "Italian",
   "French",
-  "Asian / Chinese / Japanese",
+  "Asian",
   "Mexican",
   "Home / Traditional",
 ];

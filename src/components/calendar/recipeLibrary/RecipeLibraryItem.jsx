@@ -17,7 +17,16 @@ function RecipeLibraryItem({ recipe, onSelect }) {
         userSelect: 'none',
       }}
     >
-      {recipe.name}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {recipe.name}
+        </span>
+        {recipe.__kind === 'saved' && (
+          <span style={{ fontSize: 11, opacity: 0.8, border: '1px solid #ddd', padding: '1px 6px', borderRadius: 999 }}>
+            Saved
+          </span>
+        )}
+      </div>
     </div>
   );
 }

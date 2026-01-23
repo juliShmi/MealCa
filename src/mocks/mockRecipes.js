@@ -34,5 +34,32 @@ export const mockRecipes = [
     authorId: 'user-1',
     time: 25,
     categories: ['Desserts / Sweets', 'Home / Traditional']
+  },
+  {
+    id: 'friend-1',
+    name: 'Avocado Toast',
+    ingredients: ['bread', 'avocado', 'salt', 'pepper', 'lemon'],
+    steps: ['Toast bread.', 'Mash avocado with salt, pepper, and lemon.', 'Spread on toast.'],
+    authorId: 'user-2',
+    time: 10,
+    categories: ['Breakfast', 'Snacks / Sandwiches']
+  },
+  {
+    id: 'friend-2',
+    name: 'Greek Salad',
+    ingredients: ['tomatoes', 'cucumber', 'feta', 'olives', 'olive oil'],
+    steps: ['Chop vegetables.', 'Add feta and olives.', 'Dress with olive oil.'],
+    authorId: 'user-2',
+    time: 12,
+    categories: ['Salads']
+  },
+  {
+    id: 'friend-3',
+    name: 'Pancakes',
+    ingredients: ['flour', 'milk', 'eggs', 'sugar', 'butter'],
+    steps: ['Mix ingredients into batter.', 'Cook on a pan until golden.', 'Serve with toppings.'],
+    authorId: 'user-2',
+    time: 20,
+    categories: ['Breakfast', 'Desserts / Sweets']
   }
 ];

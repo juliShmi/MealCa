@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import ActiveRecipe from './ActiveRecipe';
 
 
-function RecipeList({ recipes, categories, onDelete }) {
+function RecipeList({ recipes, categories, onDelete, savedRecipes, onUpdateSavedRecipe, onDeleteSavedRecipe }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [openByCategory, setOpenByCategory] = useState(() => ({}));
@@ -94,7 +94,26 @@ function RecipeList({ recipes, categories, onDelete }) {
                             fontWeight: 700,
                           }}
                         >
-                          {r.name}
+                          <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                            <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {r.name}
+                            </span>
+                            {r.__kind === 'saved' && (
+                              <span
+                                style={{
+                                  flex: '0 0 auto',
+                                  fontSize: 12,
+                                  padding: '2px 8px',
+                                  borderRadius: 999,
+                                  border: '1px solid #ddd',
+                                  background: '#fff',
+                                  opacity: 0.9,
+                                }}
+                              >
+                                Saved
+                              </span>
+                            )}
+                          </span>
                         </button>
                       );
                     })}
@@ -109,9 +128,23 @@ function RecipeList({ recipes, categories, onDelete }) {
       <ActiveRecipe
         recipe={activeRecipe}
         onClose={() => setSearchParams({})}
-        onEdit={() => navigate(`/recipes/edit/${activeRecipe.id}`)}
-        onDelete={() => {
-          onDelete?.(activeRecipe.id);
+        categories={categories}
+        onEdit={
+          activeRecipe?.__kind === 'own'
+            ? () => navigate(`/recipes/edit/${activeRecipe.id}`)
+            : undefined
+        }
+        onDelete={
+          activeRecipe?.__kind === 'own'
+            ? () => {
+              onDelete?.(activeRecipe.id);
+              setSearchParams({});
+            }
+            : undefined
+        }
+        onUpdateSavedRecipe={onUpdateSavedRecipe}
+        onDeleteSavedRecipe={(id) => {
+          onDeleteSavedRecipe?.(id);
           setSearchParams({});
         }}
       />

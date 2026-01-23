@@ -17,7 +17,11 @@ function Headers({ currentUser }) {
           Recipes
         </NavLink>
 
-        <NavLink to="/calendar">Calendar</NavLink>
+        <NavLink to="/calendar" style={{ marginRight: '12px' }}>
+          Calendar
+        </NavLink>
+
+        <NavLink to="/friends">Friends</NavLink>
       </div>
 
       <NavLink

@@ -2,7 +2,18 @@ import { Routes, Route, Link } from 'react-router-dom';
 import RecipeList from './RecipeList';
 import RecipeForm from './RecipeForm';
 
-function Recipes({ recipes, categories, onCreate, onUpdate, onDelete, onAddCategory }) {
+function Recipes({
+  recipes,
+  editRecipes,
+  categories,
+  savedRecipes,
+  onUpdateSavedRecipe,
+  onDeleteSavedRecipe,
+  onCreate,
+  onUpdate,
+  onDelete,
+  onAddCategory,
+}) {
 
   return (
     <div>
@@ -26,6 +37,9 @@ function Recipes({ recipes, categories, onCreate, onUpdate, onDelete, onAddCateg
             recipes={recipes}
             categories={categories}
             onDelete={onDelete}
+            savedRecipes={savedRecipes}
+            onUpdateSavedRecipe={onUpdateSavedRecipe}
+            onDeleteSavedRecipe={onDeleteSavedRecipe}
           />
         } />
 
@@ -44,7 +58,7 @@ function Recipes({ recipes, categories, onCreate, onUpdate, onDelete, onAddCateg
           path="edit/:id"
           element={
             <RecipeForm
-              recipes={recipes}
+              recipes={editRecipes ?? recipes}
               onUpdate={onUpdate}
               categories={categories}
             />

@@ -2,20 +2,73 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { mockRecipes } from './mocks/mockRecipes'
 import { mockCategories, UNCATEGORIZED } from './mocks/mockCategories'
 import { mockUsers } from './mocks/mockUsers'
+import { mockFriendships } from './mocks/mockFriendships'
 import { mockStickers } from './mocks/mockStickers'
+import { mockSavedRecipes } from './mocks/mockSavedRecipes'
 import { useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import Layout from './components/Layout';
 import CalendarPage from './pages/CalendarPage';
 import RecipesPage from './pages/RecipesPage';
 import CategoriesPage from './pages/CategoriesPage';
 import UserPage from './pages/UserPage';
+import FriendsPage from './pages/FriendsPage';
+import FriendPage from './pages/FriendPage';
 
 function App() {
+  const SAVED_CATEGORY = 'Saved';
   const [mealPlan, setMealPlan] = useState({});
   const [recipes, setRecipes] = useState(mockRecipes);
   const [categories, setCategories] = useState(mockCategories);
   const [stickers, setStickers] = useState(mockStickers);
+  const [users] = useState(mockUsers);
+  const [friendships] = useState(mockFriendships);
+  const [savedRecipes, setSavedRecipes] = useState(mockSavedRecipes);
   const [currentUser] = useState(() => mockUsers[0]);
+
+  const mySavedRecipes = savedRecipes.filter((sr) => String(sr.ownerId) === String(currentUser.id));
+  const categoriesWithSaved = mySavedRecipes.length > 0 && !categories.includes(SAVED_CATEGORY)
+    ? [SAVED_CATEGORY, ...categories]
+    : categories;
+
+  const usersById = new Map((users ?? []).map((u) => [String(u.id), u]));
+
+  const savedAsRecipeCards = mySavedRecipes.map((sr) => {
+    const sourceAuthorId = String(sr.source?.authorId ?? '');
+    const fromNickname = usersById.get(sourceAuthorId)?.nickname ?? sourceAuthorId;
+    const sourceRecipeId = String(sr.source?.recipeId ?? '');
+    const sourceExists = recipes.some(
+      (r) => String(r.authorId) === sourceAuthorId && String(r.id) === sourceRecipeId,
+    );
+
+    const snapshot = sr.snapshot ?? {};
+    const baseCats = Array.isArray(snapshot.categories) ? snapshot.categories : [];
+    const overrideCats = Array.isArray(sr.categoriesOverride) ? sr.categoriesOverride : baseCats;
+
+    return {
+      id: sr.id,
+      name: snapshot.name ?? 'Saved recipe',
+      ingredients: snapshot.ingredients ?? [],
+      steps: snapshot.steps ?? [],
+      time: snapshot.time,
+      categories: [SAVED_CATEGORY, ...overrideCats],
+      authorId: currentUser.id,
+      __kind: 'saved',
+      __saved: {
+        source: sr.source,
+        fromNickname,
+        notes: sr.notes ?? '',
+        sourceMissing: !sourceExists,
+      },
+    };
+  });
+
+  const myOwnRecipes = recipes.filter((r) => String(r.authorId) === String(currentUser.id)).map((r) => ({
+    ...r,
+    __kind: 'own',
+  }));
+
+  const myAccessibleRecipes = [...myOwnRecipes, ...savedAsRecipeCards];
 
   const deleteRecipe = (id) => {
     setRecipes(prev => prev.filter(r => r.id !== id));
@@ -91,15 +144,41 @@ function App() {
     );
   };
 
+  const updateSavedRecipe = (savedId, patch) => {
+    setSavedRecipes((prev) =>
+      prev.map((sr) => (String(sr.id) === String(savedId) ? { ...sr, ...patch } : sr)),
+    );
+  };
+
+  const deleteSavedRecipe = (savedId) => {
+    setSavedRecipes((prev) => prev.filter((sr) => String(sr.id) !== String(savedId)));
+    setMealPlan((prev) => {
+      const cleaned = {};
+      Object.keys(prev).forEach((date) => {
+        cleaned[date] = {};
+        ['breakfast', 'lunch', 'dinner', 'snack'].forEach((meal) => {
+          const arr = prev[date]?.[meal] || [];
+          cleaned[date][meal] = arr.filter((token) => String(token) !== `recipe:${savedId}`);
+        });
+      });
+      return cleaned;
+    });
+  };
+
   return (
     <>
       <Routes>
         <Route element={<Layout currentUser={currentUser} />}>
           <Route path="/" element={<Navigate to="/recipes" />} />
           {<Route path="/recipes/*" element={<RecipesPage
-            recipes={recipes}
+            recipes={myAccessibleRecipes}
+            ownRecipes={myOwnRecipes}
             setRecipes={setRecipes}
-            categories={categories}
+            savedRecipes={savedRecipes}
+            onUpdateSavedRecipe={updateSavedRecipe}
+            onDeleteSavedRecipe={deleteSavedRecipe}
+            users={users}
+            categories={categoriesWithSaved}
             setCategories={setCategories}
             onDelete={deleteRecipe}
             currentUser={currentUser}
@@ -109,8 +188,8 @@ function App() {
           <Route path="/calendar" element={<CalendarPage
             mealPlan={mealPlan}
             setMealPlan={setMealPlan}
-            recipes={recipes}
-            categories={categories}
+            recipes={myAccessibleRecipes}
+            categories={categoriesWithSaved}
             stickers={stickers}
             onCreateSticker={addSticker}
             onUpdateSticker={updateSticker}
@@ -124,6 +203,65 @@ function App() {
                 onAddCategory={addCategory}
                 onDeleteCategory={deleteCategory}
                 uncategorized={UNCATEGORIZED}
+              />
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <FriendsPage
+                currentUser={currentUser}
+                users={users}
+                friendships={friendships}
+              />
+            }
+          />
+          <Route
+            path="/friends/:id"
+            element={
+              <FriendPage
+                currentUser={currentUser}
+                users={users}
+                friendships={friendships}
+                recipes={recipes}
+                categories={categories}
+                onSaveRecipe={(recipe, friendUser) => {
+                  if (!recipe) return;
+                  const ownerId = String(currentUser.id);
+                  const sourceAuthorId = String(friendUser?.id ?? recipe.authorId);
+                  const sourceRecipeId = String(recipe.id);
+
+                  setSavedRecipes((prev) => {
+                    const already = prev.some(
+                      (sr) =>
+                        String(sr.ownerId) === ownerId &&
+                        String(sr.source?.authorId) === sourceAuthorId &&
+                        String(sr.source?.recipeId) === sourceRecipeId,
+                    );
+                    if (already) return prev;
+
+                    const snapshot = {
+                      name: recipe.name,
+                      ingredients: recipe.ingredients ?? [],
+                      steps: recipe.steps ?? [],
+                      time: recipe.time,
+                      categories: recipe.categories ?? [],
+                    };
+
+                    return [
+                      ...prev,
+                      {
+                        id: `saved-${uuidv4()}`,
+                        ownerId,
+                        source: { authorId: sourceAuthorId, recipeId: sourceRecipeId },
+                        savedAt: new Date().toISOString(),
+                        notes: "",
+                        categoriesOverride: snapshot.categories,
+                        snapshot,
+                      },
+                    ];
+                  });
+                }}
               />
             }
           />

@@ -1,6 +1,18 @@
 import Recipes from "../components/recipes/Recipes";
 
-function RecipesPage({ recipes, setRecipes, categories, setCategories, onDelete, currentUser }) {
+function RecipesPage({
+  recipes,
+  ownRecipes,
+  setRecipes,
+  savedRecipes,
+  onUpdateSavedRecipe,
+  onDeleteSavedRecipe,
+  users,
+  categories,
+  setCategories,
+  onDelete,
+  currentUser,
+}) {
 
   const addRecipe = (recipe) => {
     const authorId = currentUser?.id;
@@ -24,6 +36,11 @@ function RecipesPage({ recipes, setRecipes, categories, setCategories, onDelete,
 
   return <Recipes
     recipes={recipes}
+    editRecipes={ownRecipes}
+    savedRecipes={savedRecipes}
+    onUpdateSavedRecipe={onUpdateSavedRecipe}
+    onDeleteSavedRecipe={onDeleteSavedRecipe}
+    users={users}
     categories={categories}
     onCreate={addRecipe}
     onUpdate={updateRecipe}
