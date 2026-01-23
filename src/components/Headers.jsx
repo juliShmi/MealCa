@@ -1,6 +1,11 @@
 import { NavLink } from 'react-router-dom';
 
 function Headers({ currentUser }) {
+  const avatarChar = String(currentUser?.nickname ?? 'U')
+    .trim()
+    .slice(0, 2)
+    .toUpperCase();
+
   return (
     <header
       style={{
@@ -31,16 +36,18 @@ function Headers({ currentUser }) {
         style={{
           width: 34,
           height: 34,
-          borderRadius: 999,
-          border: '1px solid #ddd',
+          borderRadius: 0,
+          border: '3px solid #111',
           display: 'grid',
           placeItems: 'center',
           textDecoration: 'none',
           color: 'inherit',
           background: '#fff',
+          fontWeight: 900,
+          boxShadow: '4px 4px 0 0 #111',
         }}
       >
-        👤
+        {avatarChar}
       </NavLink>
     </header>
   );

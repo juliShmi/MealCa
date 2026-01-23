@@ -1,0 +1,140 @@
+/* Pixel-art-ish theme (default) */
+
+:root {
+  --px-bg: #cfe8ff;
+  --px-surface: #ffffff;
+  --px-ink: #111111;
+  --px-ink-soft: rgba(17, 17, 17, 0.6);
+  --px-border: 3px;
+  --px-shadow: 4px;
+  --px-gap: 10px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--px-ink);
+  background: var(--px-bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+
+/* Make things feel crisp */
+img,
+canvas,
+video {
+  image-rendering: pixelated;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+/* Headings */
+h1,
+h2,
+h3 {
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Common controls */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  background: var(--px-surface);
+  color: var(--px-ink);
+  border: var(--px-border) solid var(--px-ink);
+  border-radius: 0;
+  padding: 8px 10px;
+  box-shadow: var(--px-shadow) var(--px-shadow) 0 0 var(--px-ink);
+}
+
+button:active {
+  transform: translate(var(--px-shadow), var(--px-shadow));
+  box-shadow: 0 0 0 0 var(--px-ink);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+input,
+textarea,
+select {
+  background: var(--px-surface);
+  color: var(--px-ink);
+  border: var(--px-border) solid var(--px-ink);
+  border-radius: 0;
+  padding: 8px 10px;
+  box-shadow: var(--px-shadow) var(--px-shadow) 0 0 rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow:
+    var(--px-shadow) var(--px-shadow) 0 0 rgba(0, 0, 0, 0.35),
+    0 0 0 3px rgba(0, 0, 0, 0.25);
+}
+
+/* App header / main */
+header {
+  background: var(--px-surface) !important;
+  border-bottom: var(--px-border) solid var(--px-ink) !important;
+}
+
+main {
+  padding: 14px;
+}
+
+/* Recipe card */
+.recipe-card {
+  background: var(--px-surface);
+  border: var(--px-border) solid var(--px-ink);
+  border-radius: 0;
+  box-shadow: var(--px-shadow) var(--px-shadow) 0 0 var(--px-ink);
+  padding: 12px;
+}
+
+/* Draggable “cards” (calendar items + library items + stickers) */
+div[draggable="true"] {
+  border-radius: 0 !important;
+  box-shadow: var(--px-shadow) var(--px-shadow) 0 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Modal overlay */
+[aria-label="Recipe details"] {
+  border-radius: 0 !important;
+  border: var(--px-border) solid var(--px-ink) !important;
+  box-shadow: var(--px-shadow) var(--px-shadow) 0 0 var(--px-ink) !important;
+}
+
+/* Tiny text */
+small,
+.muted {
+  color: var(--px-ink-soft);
+}
+

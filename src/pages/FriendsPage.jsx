@@ -51,15 +51,16 @@ function FriendsPage({ currentUser, users = [], friendships = [] }) {
                   style={{
                     width: 36,
                     height: 36,
-                    borderRadius: 999,
-                    background: "#eee",
-                    border: "1px solid #ddd",
+                    borderRadius: 0,
+                    background: "#fff",
+                    border: "3px solid #111",
                     display: "grid",
                     placeItems: "center",
                     fontWeight: 900,
+                    boxShadow: "4px 4px 0 0 #111",
                   }}
                 >
-                  {(user.nickname ?? "?").slice(0, 1).toUpperCase()}
+                  {(user.nickname ?? "?").slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <div style={{ fontWeight: 900 }}>{user.nickname}</div>
