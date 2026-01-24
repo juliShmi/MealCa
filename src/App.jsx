@@ -23,7 +23,7 @@ function App() {
   const [categories, setCategories] = useState(mockCategories);
   const [stickers, setStickers] = useState(mockStickers);
   const [users] = useState(mockUsers);
-  const [friendships] = useState(mockFriendships);
+  const [friendships, setFriendships] = useState(mockFriendships);
   const [savedRecipes, setSavedRecipes] = useState(mockSavedRecipes);
   const [currentUser] = useState(() => mockUsers[0]);
   const [toast, setToast] = useState(null);
@@ -171,6 +171,39 @@ function App() {
     });
   };
 
+  const removeFriendToFollower = (friendId) => {
+    const me = String(currentUser.id);
+    const other = String(friendId);
+    setFriendships((prev) =>
+      (prev ?? []).map((f) => {
+        const a = String(f.userId);
+        const b = String(f.friendId);
+        const isThisPair = (a === me && b === other) || (a === other && b === me);
+        if (!isThisPair) return f;
+        if (f.status !== 'accepted') return f;
+        // follower means: other follows me (one-way)
+        return { ...f, userId: me, friendId: other, status: 'follower' };
+      }),
+    );
+    showToast('Removed from friends');
+  };
+
+  const followBack = (friendId) => {
+    const me = String(currentUser.id);
+    const other = String(friendId);
+    setFriendships((prev) =>
+      (prev ?? []).map((f) => {
+        const a = String(f.userId);
+        const b = String(f.friendId);
+        if (f.status === 'follower' && a === me && b === other) {
+          return { ...f, status: 'accepted' };
+        }
+        return f;
+      }),
+    );
+    showToast('Now you are friends');
+  };
+
   return (
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
@@ -221,6 +254,8 @@ function App() {
                 currentUser={currentUser}
                 users={users}
                 friendships={friendships}
+                onRemoveFriend={removeFriendToFollower}
+                onFollow={followBack}
               />
             }
           />

@@ -11,13 +11,21 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
 
   const isFriend = useMemo(() => {
     return (friendships ?? []).some((f) => {
-      if (f?.status !== "accepted") return false;
       const a = String(f.userId);
       const b = String(f.friendId);
-      return (
-        (a === String(currentUser?.id) && b === friendId) ||
-        (b === String(currentUser?.id) && a === friendId)
-      );
+      if (f?.status === "accepted") {
+        return (
+          (a === String(currentUser?.id) && b === friendId) ||
+          (b === String(currentUser?.id) && a === friendId)
+        );
+      }
+
+      // follower means: friendId follows me (userId is me)
+      if (f?.status === "follower") {
+        return a === String(currentUser?.id) && b === friendId;
+      }
+
+      return false;
     });
   }, [friendships, currentUser, friendId]);
 
