@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { normalizeIngredients } from "../../utils/ingredients";
 
 function RecipeCard({ title, ingredients, time, steps, actions, onStepsChange }) {
   const isStepsEditable = typeof onStepsChange === 'function';
   const [newStep, setNewStep] = useState('');
   const [editingIdx, setEditingIdx] = useState(null);
   const [editingValue, setEditingValue] = useState('');
+
+  const normalizedIngredients = useMemo(() => normalizeIngredients(ingredients), [ingredients]);
 
   useEffect(() => {
     if (!isStepsEditable) return;
@@ -46,10 +49,33 @@ function RecipeCard({ title, ingredients, time, steps, actions, onStepsChange })
         </div>
       )}
 
-      {Array.isArray(ingredients) && ingredients.length > 0 && (
-        <p>
-          <strong>Ingredients:</strong> {ingredients.join(', ')}
-        </p>
+      {normalizedIngredients.length > 0 && (
+        <div style={{ marginTop: 8 }}>
+          <div style={{ fontWeight: 800, marginBottom: 6 }}>Ingredients</div>
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 18,
+              columns: normalizedIngredients.length >= 10 ? 2 : 1,
+              columnGap: 28,
+            }}
+          >
+            {normalizedIngredients
+              .filter((i) => i.name.trim() !== "")
+              .map((ing, idx) => (
+                <li key={idx} style={{ breakInside: "avoid", marginBottom: 4 }}>
+                  <span>{ing.name}</span>
+                  {ing.amount != null && !Number.isNaN(Number(ing.amount)) && (
+                    <span style={{ opacity: 0.85 }}>
+                      {" "}
+                      — {Number(ing.amount)}
+                      {ing.unit ? ` ${ing.unit}` : ""}
+                    </span>
+                  )}
+                </li>
+              ))}
+          </ul>
+        </div>
       )}
 
       <div>

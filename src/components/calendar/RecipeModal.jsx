@@ -1,3 +1,5 @@
+import { normalizeIngredients } from "../../utils/ingredients";
+
 function RecipeModal({ isOpen, recipe, onClose }) {
   if (!isOpen || !recipe) return null;
 
@@ -59,10 +61,28 @@ function RecipeModal({ isOpen, recipe, onClose }) {
 
         <div style={{ marginTop: 14 }}>
           <div style={{ fontWeight: 700, marginBottom: 6 }}>Ingredients</div>
-          <ul style={{ margin: 0, paddingLeft: 18 }}>
-            {(recipe.ingredients ?? []).map((ing, idx) => (
-              <li key={idx}>{ing}</li>
-            ))}
+          <ul
+            style={{
+              margin: 0,
+              paddingLeft: 18,
+              columns: normalizeIngredients(recipe.ingredients).length >= 10 ? 2 : 1,
+              columnGap: 28,
+            }}
+          >
+            {normalizeIngredients(recipe.ingredients)
+              .filter((i) => i.name.trim() !== "")
+              .map((ing, idx) => (
+                <li key={idx} style={{ breakInside: "avoid", marginBottom: 4 }}>
+                  <span>{ing.name}</span>
+                  {ing.amount != null && !Number.isNaN(Number(ing.amount)) && (
+                    <span style={{ opacity: 0.85 }}>
+                      {" "}
+                      — {Number(ing.amount)}
+                      {ing.unit ? ` ${ing.unit}` : ""}
+                    </span>
+                  )}
+                </li>
+              ))}
           </ul>
         </div>
 

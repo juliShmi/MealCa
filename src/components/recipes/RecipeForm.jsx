@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_INGREDIENT_UNIT, INGREDIENT_UNITS } from "../../constants/ingredientUnits";
+import { normalizeIngredient, normalizeIngredients } from "../../utils/ingredients";
 
 
 function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) {
@@ -12,7 +14,7 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
 
   const [name, setName] = useState('');
   const [time, setTime] = useState('');
-  const [ingredients, setIngredients] = useState(['']);
+  const [ingredients, setIngredients] = useState(() => [normalizeIngredient("")]);
   const [steps, setSteps] = useState(['']);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [newCategory, setNewCategory] = useState('');
@@ -37,7 +39,8 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     if (isEdit && recipeToEdit) {
       setName(recipeToEdit.name);
       setTime(recipeToEdit.time);
-      setIngredients(recipeToEdit.ingredients);
+      const initialIngredients = normalizeIngredients(recipeToEdit.ingredients);
+      setIngredients(initialIngredients.length > 0 ? initialIngredients : [normalizeIngredient("")]);
       const initialSteps =
         Array.isArray(recipeToEdit.steps) && recipeToEdit.steps.length > 0
           ? recipeToEdit.steps
@@ -63,11 +66,13 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
       newErrors.time = 'Time must be under 24 hours';
     }
 
-    const cleanedIngredients = ingredients.filter(i => i.trim() !== '');
+    const cleanedIngredients = normalizeIngredients(ingredients).filter((i) => i.name.trim() !== "");
     if (cleanedIngredients.length === 0) {
       newErrors.ingredients = 'Add at least one ingredient';
     } else if (cleanedIngredients.length > 20) {
       newErrors.ingredients = 'Too many ingredients (max 20)';
+    } else if (cleanedIngredients.some((i) => i.amount != null && Number(i.amount) <= 0)) {
+      newErrors.ingredients = "Ingredient amount must be greater than 0";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -82,7 +87,13 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
     const recipe = {
       id: isEdit ? recipeToEdit.id : uuidv4(),
       name,
-      ingredients: ingredients.filter((i) => i.trim() !== ""),
+      ingredients: normalizeIngredients(ingredients)
+        .filter((i) => i.name.trim() !== "")
+        .map((i) => ({
+          name: i.name.trim(),
+          amount: i.amount == null ? null : Number(i.amount),
+          unit: i.unit,
+        })),
       steps: steps.filter((s) => s.trim() !== ""),
       time: Number(time),
       categories: selectedCategories,
@@ -101,18 +112,23 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
   const resetForm = () => {
     setName('');
     setTime('');
-    setIngredients(['']);
+    setIngredients([normalizeIngredient("")]);
     setSteps(['']);
   };
 
   const addIngredient = () => {
-    setIngredients([...ingredients, '']);
+    setIngredients((prev) => [...prev, normalizeIngredient("")]);
   };
 
-  const handleIngredientChange = (index, value) => {
-    const newIngredients = [...ingredients];
-    newIngredients[index] = value;
-    setIngredients(newIngredients);
+  const updateIngredient = (index, patch) => {
+    setIngredients((prev) => prev.map((ing, i) => (i === index ? { ...ing, ...patch } : ing)));
+  };
+
+  const removeIngredient = (index) => {
+    setIngredients((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      return next.length > 0 ? next : [normalizeIngredient("")];
+    });
   };
 
   const addStep = () => {
@@ -166,17 +182,44 @@ function RecipeForm({ onCreate, onUpdate, categories, onAddCategory, recipes }) 
             display: 'flex',
             flexDirection: 'column',
             gap: '5px',
-            maxWidth: '300px',
+            maxWidth: '420px',
           }}
         >
           {ingredients.map((ing, index) => (
-            <input
-              key={index}
-              type="text"
-              placeholder={`Ingredient ${index + 1}`}
-              value={ing}
-              onChange={(e) => handleIngredientChange(index, e.target.value)}
-            />
+            <div key={index} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <input
+                type="text"
+                placeholder={`Ingredient ${index + 1}`}
+                value={ing?.name ?? ""}
+                onChange={(e) => updateIngredient(index, { name: e.target.value })}
+                style={{ flex: 1, minWidth: 0 }}
+              />
+              <input
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="1"
+                placeholder="Amount"
+                value={ing?.amount ?? ""}
+                onChange={(e) => updateIngredient(index, { amount: e.target.value })}
+                style={{ width: 90 }}
+              />
+              <select
+                value={INGREDIENT_UNITS.includes(ing?.unit) ? ing.unit : DEFAULT_INGREDIENT_UNIT}
+                onChange={(e) => updateIngredient(index, { unit: e.target.value })}
+                style={{ width: 64 }}
+                aria-label="Unit"
+              >
+                {INGREDIENT_UNITS.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+              <button type="button" onClick={() => removeIngredient(index)} title="Remove ingredient">
+                −
+              </button>
+            </div>
           ))}
         </div>
         {errors.ingredients && (
