@@ -22,6 +22,7 @@ function ActiveRecipe({
   const [savedCats, setSavedCats] = useState(
     Array.isArray(recipe.categories) ? recipe.categories.filter((c) => c !== "Saved") : [],
   );
+  const notesRef = useRef(null);
 
   useEffect(() => {
     // reset drafts when switching active recipe
@@ -29,6 +30,20 @@ function ActiveRecipe({
     setSavedNotes(String(recipe.__saved?.notes ?? ""));
     setSavedCats(Array.isArray(recipe.categories) ? recipe.categories.filter((c) => c !== "Saved") : []);
   }, [recipe.id]);
+
+  useEffect(() => {
+    if (!isSavedEditing) return;
+    // focus notes when entering edit mode
+    const el = notesRef.current;
+    if (!el) return;
+    el.focus?.();
+    try {
+      const v = String(el.value ?? "");
+      el.setSelectionRange?.(v.length, v.length);
+    } catch {
+      // ignore: non-textarea or unsupported selection api
+    }
+  }, [isSavedEditing]);
 
   const resolvedMenuItems = (() => {
     if (Array.isArray(menuItems) && menuItems.length > 0) return menuItems;
@@ -78,6 +93,20 @@ function ActiveRecipe({
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [isMenuOpen]);
 
+  const displayCats = Array.isArray(recipe.categories)
+    ? recipe.categories.filter((c) => c !== "Saved")
+    : [];
+
+  const formatTime = (minutes) => {
+    const m = Number(minutes);
+    if (!m || Number.isNaN(m)) return "";
+    const h = Math.floor(m / 60);
+    const mm = m % 60;
+    if (h === 0) return `${mm} min`;
+    if (mm === 0) return `${h} h`;
+    return `${h} h ${mm} min`;
+  };
+
   return (
     <aside
       style={{
@@ -125,6 +154,13 @@ function ActiveRecipe({
             >
               {recipe.name}
             </div>
+            {(displayCats.length > 0 || (recipe.time != null && !Number.isNaN(Number(recipe.time)))) && (
+              <div style={{ marginTop: 2, fontSize: 12, opacity: 0.75 }}>
+                {displayCats.length > 0 ? displayCats.join(", ") : ""}
+                {displayCats.length > 0 && recipe.time != null ? " · " : ""}
+                {recipe.time != null ? formatTime(recipe.time) : ""}
+              </div>
+            )}
             {recipe.__kind === "saved" && (
               <div style={{ marginTop: 2, display: "flex", alignItems: "center", gap: 8 }}>
                 <span
@@ -274,11 +310,19 @@ function ActiveRecipe({
 
         {isSaved && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ fontWeight: 900, marginBottom: 6 }}>My notes</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+              <div style={{ fontWeight: 900, marginBottom: 6 }}>My notes</div>
+              {!isSavedEditing && (
+                <button type="button" onClick={() => setIsSavedEditing(true)} aria-label="Make a note" title="Make a note">
+                  📝
+                </button>
+              )}
+            </div>
 
             {isSavedEditing ? (
               <>
                 <textarea
+                  ref={notesRef}
                   value={savedNotes}
                   onChange={(e) => setSavedNotes(e.target.value)}
                   rows={4}
@@ -342,21 +386,11 @@ function ActiveRecipe({
               </>
             ) : (
               <>
-                <div
-                  style={{
-                    padding: 10,
-                    borderRadius: 10,
-                    border: "1px solid #eee",
-                    background: "#fafafa",
-                    whiteSpace: "pre-wrap",
-                    minHeight: 44,
-                  }}
-                >
-                  {savedNotes.trim() ? savedNotes : <span style={{ opacity: 0.6 }}>No notes yet.</span>}
-                </div>
-                <div style={{ marginTop: 10, fontSize: 12, opacity: 0.75 }}>
-                  Categories: {savedCats.length > 0 ? savedCats.join(", ") : "—"}
-                </div>
+                {savedNotes.trim() ? (
+                  <div style={{ whiteSpace: "pre-wrap", opacity: 0.85 }}>{savedNotes}</div>
+                ) : (
+                  <div style={{ opacity: 0.6 }}>No notes yet.</div>
+                )}
               </>
             )}
           </div>
