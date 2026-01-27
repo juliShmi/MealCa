@@ -5,6 +5,7 @@ import { mockUsers } from './mocks/mockUsers'
 import { mockFriendships } from './mocks/mockFriendships'
 import { mockStickers } from './mocks/mockStickers'
 import { mockSavedRecipes } from './mocks/mockSavedRecipes'
+import { mockLikes } from './mocks/mockLikes'
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Layout from './components/Layout';
@@ -25,6 +26,7 @@ function App() {
   const [users] = useState(mockUsers);
   const [friendships, setFriendships] = useState(mockFriendships);
   const [savedRecipes, setSavedRecipes] = useState(mockSavedRecipes);
+  const [likes, setLikes] = useState(mockLikes);
   const [currentUser] = useState(() => mockUsers[0]);
   const [toast, setToast] = useState(null);
 
@@ -204,6 +206,38 @@ function App() {
     showToast('Now you are friends');
   };
 
+  const likesByKey = (() => {
+    const map = new Map();
+    (likes ?? []).forEach((l) => {
+      const key = `${String(l.authorId)}:${String(l.recipeId)}`;
+      const set = map.get(key) ?? new Set();
+      set.add(String(l.userId));
+      map.set(key, set);
+    });
+    return map;
+  })();
+
+  const toggleLike = (recipe) => {
+    if (!recipe) return;
+    const authorId = String(recipe.authorId);
+    const recipeId = String(recipe.id);
+    const userId = String(currentUser.id);
+
+    if (recipe.__kind === 'saved') return;
+
+    setLikes((prev) => {
+      const already = (prev ?? []).some(
+        (l) => String(l.userId) === userId && String(l.authorId) === authorId && String(l.recipeId) === recipeId,
+      );
+      if (already) {
+        return (prev ?? []).filter(
+          (l) => !(String(l.userId) === userId && String(l.authorId) === authorId && String(l.recipeId) === recipeId),
+        );
+      }
+      return [...(prev ?? []), { id: `like-${uuidv4()}`, userId, authorId, recipeId, createdAt: new Date().toISOString() }];
+    });
+  };
+
   return (
     <>
       <Toast toast={toast} onClose={() => setToast(null)} />
@@ -222,6 +256,8 @@ function App() {
             setCategories={setCategories}
             onDelete={deleteRecipe}
             currentUser={currentUser}
+            likesByKey={likesByKey}
+            onToggleLike={toggleLike}
           />
           }
           />}
@@ -268,6 +304,8 @@ function App() {
                 friendships={friendships}
                 recipes={recipes}
                 categories={categories}
+                likesByKey={likesByKey}
+                onToggleLike={toggleLike}
                 onSaveRecipe={(recipe, friendUser) => {
                   if (!recipe) return;
                   const ownerId = String(currentUser.id);

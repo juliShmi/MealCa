@@ -6,13 +6,15 @@ function Recipes({
   recipes,
   editRecipes,
   categories,
-  savedRecipes,
   onUpdateSavedRecipe,
   onDeleteSavedRecipe,
   onCreate,
   onUpdate,
   onDelete,
   onAddCategory,
+  currentUser,
+  likesByKey,
+  onToggleLike,
 }) {
 
   return (
@@ -37,9 +39,11 @@ function Recipes({
             recipes={recipes}
             categories={categories}
             onDelete={onDelete}
-            savedRecipes={savedRecipes}
             onUpdateSavedRecipe={onUpdateSavedRecipe}
             onDeleteSavedRecipe={onDeleteSavedRecipe}
+            currentUser={currentUser}
+            likesByKey={likesByKey}
+            onToggleLike={onToggleLike}
           />
         } />
 

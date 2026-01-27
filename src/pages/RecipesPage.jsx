@@ -4,7 +4,6 @@ function RecipesPage({
   recipes,
   ownRecipes,
   setRecipes,
-  savedRecipes,
   onUpdateSavedRecipe,
   onDeleteSavedRecipe,
   users,
@@ -12,6 +11,8 @@ function RecipesPage({
   setCategories,
   onDelete,
   currentUser,
+  likesByKey,
+  onToggleLike,
 }) {
 
   const addRecipe = (recipe) => {
@@ -37,7 +38,6 @@ function RecipesPage({
   return <Recipes
     recipes={recipes}
     editRecipes={ownRecipes}
-    savedRecipes={savedRecipes}
     onUpdateSavedRecipe={onUpdateSavedRecipe}
     onDeleteSavedRecipe={onDeleteSavedRecipe}
     users={users}
@@ -45,6 +45,10 @@ function RecipesPage({
     onCreate={addRecipe}
     onUpdate={updateRecipe}
     onDelete={onDelete}
-    onAddCategory={addCategory}></Recipes>
+    onAddCategory={addCategory}
+    currentUser={currentUser}
+    likesByKey={likesByKey}
+    onToggleLike={onToggleLike}
+  ></Recipes>
 }
 export default RecipesPage;

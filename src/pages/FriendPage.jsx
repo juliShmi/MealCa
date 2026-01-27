@@ -2,7 +2,16 @@ import { useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import ActiveRecipe from "../components/recipes/ActiveRecipe";
 
-function FriendPage({ currentUser, users = [], friendships = [], recipes = [], categories = [], onSaveRecipe }) {
+function FriendPage({
+  currentUser,
+  users = [],
+  friendships = [],
+  recipes = [],
+  categories = [],
+  likesByKey,
+  onToggleLike,
+  onSaveRecipe,
+}) {
   const { id } = useParams();
   const friendId = String(id);
   const navigate = useNavigate();
@@ -20,7 +29,6 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
         );
       }
 
-      // follower means: friendId follows me (userId is me)
       if (f?.status === "follower") {
         return a === String(currentUser?.id) && b === friendId;
       }
@@ -46,7 +54,7 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
   const categoriesForFriend = useMemo(() => {
     const set = new Set();
     (friendRecipes ?? []).forEach((r) => (r.categories ?? []).forEach((c) => set.add(c)));
-    // keep global category ordering first, then append any unknown ones
+
     const ordered = [];
     (categories ?? []).forEach((c) => set.has(c) && ordered.push(c));
     Array.from(set).forEach((c) => {
@@ -61,6 +69,14 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
       recipes: friendRecipes.filter((r) => (r.categories ?? []).includes(cat)),
     }));
   }, [categoriesForFriend, friendRecipes]);
+
+  const getLikeMeta = (recipe) => {
+    const key = `${String(recipe.authorId)}:${String(recipe.id)}`;
+    const set = likesByKey?.get?.(key);
+    const count = set?.size ?? 0;
+    const likedByMe = set?.has?.(String(currentUser?.id)) ?? false;
+    return { count, likedByMe };
+  };
 
   if (!isFriend) {
     return (
@@ -123,6 +139,7 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
                   <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 6 }}>
                     {filtered.map((r) => {
                       const isActive = String(r.id) === String(activeRecipeId);
+                      const likeMeta = getLikeMeta(r);
                       return (
                         <button
                           key={r.id}
@@ -139,7 +156,29 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
                             fontWeight: 700,
                           }}
                         >
-                          {r.name}
+                          <span style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                            <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {r.name}
+                            </span>
+                            <span style={{ display: "flex", alignItems: "center", gap: 8, flex: "0 0 auto" }}>
+                              <span style={{ fontSize: 12, opacity: 0.8 }}>♥ {likeMeta.count}</span>
+                              {likeMeta.likedByMe && (
+                                <span
+                                  style={{
+                                    fontSize: 12,
+                                    padding: "2px 8px",
+                                    borderRadius: 999,
+                                    border: "1px solid #ddd",
+                                    background: "#fff",
+                                    opacity: 0.9,
+                                    fontWeight: 800,
+                                  }}
+                                >
+                                  Liked
+                                </span>
+                              )}
+                            </span>
+                          </span>
                         </button>
                       );
                     })}
@@ -154,6 +193,9 @@ function FriendPage({ currentUser, users = [], friendships = [], recipes = [], c
       <ActiveRecipe
         recipe={activeRecipe}
         onClose={() => setSearchParams({})}
+        currentUserId={currentUser?.id}
+        likesByKey={likesByKey}
+        onToggleLike={onToggleLike}
         menuItems={[
           {
             key: "save",

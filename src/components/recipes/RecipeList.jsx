@@ -3,7 +3,16 @@ import { useEffect, useMemo, useState } from 'react';
 import ActiveRecipe from './ActiveRecipe';
 
 
-function RecipeList({ recipes, categories, onDelete, savedRecipes, onUpdateSavedRecipe, onDeleteSavedRecipe }) {
+function RecipeList({
+  recipes,
+  categories,
+  onDelete,
+  onUpdateSavedRecipe,
+  onDeleteSavedRecipe,
+  currentUser,
+  likesByKey,
+  onToggleLike,
+}) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [openByCategory, setOpenByCategory] = useState(() => ({}));
@@ -25,6 +34,11 @@ function RecipeList({ recipes, categories, onDelete, savedRecipes, onUpdateSaved
       recipes: recipes.filter((r) => (r.categories ?? []).includes(cat)),
     }));
   }, [categories, recipes]);
+
+  const getLikeCount = (recipe) => {
+    const key = `${String(recipe.authorId)}:${String(recipe.id)}`;
+    return likesByKey?.get?.(key)?.size ?? 0;
+  };
 
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
@@ -78,6 +92,8 @@ function RecipeList({ recipes, categories, onDelete, savedRecipes, onUpdateSaved
                   <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
                     {filtered.map((r) => {
                       const isActive = String(r.id) === String(activeRecipeId);
+                      const likeCount =
+                        r.__kind === "own" ? getLikeCount(r) : null;
                       return (
                         <button
                           key={r.id}
@@ -98,21 +114,25 @@ function RecipeList({ recipes, categories, onDelete, savedRecipes, onUpdateSaved
                             <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {r.name}
                             </span>
-                            {r.__kind === 'saved' && (
-                              <span
-                                style={{
-                                  flex: '0 0 auto',
-                                  fontSize: 12,
-                                  padding: '2px 8px',
-                                  borderRadius: 999,
-                                  border: '1px solid #ddd',
-                                  background: '#fff',
-                                  opacity: 0.9,
-                                }}
-                              >
-                                Saved
-                              </span>
-                            )}
+                            <span style={{ display: "flex", alignItems: "center", gap: 8, flex: "0 0 auto" }}>
+                              {typeof likeCount === "number" && (
+                                <span style={{ fontSize: 12, opacity: 0.8 }}>♥ {likeCount}</span>
+                              )}
+                              {r.__kind === 'saved' && (
+                                <span
+                                  style={{
+                                    fontSize: 12,
+                                    padding: '2px 8px',
+                                    borderRadius: 999,
+                                    border: '1px solid #ddd',
+                                    background: '#fff',
+                                    opacity: 0.9,
+                                  }}
+                                >
+                                  Saved
+                                </span>
+                              )}
+                            </span>
                           </span>
                         </button>
                       );
@@ -129,6 +149,9 @@ function RecipeList({ recipes, categories, onDelete, savedRecipes, onUpdateSaved
         recipe={activeRecipe}
         onClose={() => setSearchParams({})}
         categories={categories}
+        currentUserId={currentUser?.id}
+        likesByKey={likesByKey}
+        onToggleLike={onToggleLike}
         onEdit={
           activeRecipe?.__kind === 'own'
             ? () => navigate(`/recipes/edit/${activeRecipe.id}`)

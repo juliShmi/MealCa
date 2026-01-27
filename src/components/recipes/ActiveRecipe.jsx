@@ -10,10 +10,14 @@ function ActiveRecipe({
   categories,
   onUpdateSavedRecipe,
   onDeleteSavedRecipe,
+  currentUserId,
+  likesByKey,
+  onToggleLike,
 }) {
   if (!recipe) return null;
 
   const isSaved = recipe.__kind === "saved";
+  const isOwn = !isSaved && String(recipe.authorId) === String(currentUserId ?? "");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -52,22 +56,22 @@ function ActiveRecipe({
       return [
         ...(typeof onUpdateSavedRecipe === "function"
           ? [
-              {
-                key: "editSaved",
-                label: "Edit (notes & categories)",
-                onClick: () => setIsSavedEditing(true),
-              },
-            ]
+            {
+              key: "editSaved",
+              label: "Edit (notes & categories)",
+              onClick: () => setIsSavedEditing(true),
+            },
+          ]
           : []),
         ...(typeof onDeleteSavedRecipe === "function"
           ? [
-              {
-                key: "removeSaved",
-                label: "Remove from Saved",
-                onClick: () => onDeleteSavedRecipe?.(recipe.id),
-                tone: "danger",
-              },
-            ]
+            {
+              key: "removeSaved",
+              label: "Remove from Saved",
+              onClick: () => onDeleteSavedRecipe?.(recipe.id),
+              tone: "danger",
+            },
+          ]
           : []),
       ];
     }
@@ -106,6 +110,12 @@ function ActiveRecipe({
     if (mm === 0) return `${h} h`;
     return `${h} h ${mm} min`;
   };
+
+  const likeKey = `${String(recipe.authorId)}:${String(recipe.id)}`;
+  const likeSet = likesByKey?.get?.(likeKey);
+  const likeCount = likeSet?.size ?? 0;
+  const likedByMe = likeSet?.has?.(String(currentUserId ?? "")) ?? false;
+  const canToggleLike = !isSaved && !isOwn && typeof onToggleLike === "function" && currentUserId != null;
 
   return (
     <aside
@@ -200,6 +210,70 @@ function ActiveRecipe({
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8, position: "relative" }} ref={menuRef}>
+          {!isSaved && (
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {canToggleLike ? (
+                <button
+                  type="button"
+                  onClick={() => onToggleLike?.(recipe)}
+                  aria-pressed={likedByMe}
+                  aria-label={likedByMe ? "Unlike" : "Like"}
+                  title={likedByMe ? "Unlike" : "Like"}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 999,
+                    border: "1px solid #ddd",
+                    background: "#fff",
+                    cursor: "pointer",
+                    lineHeight: 1,
+                    fontSize: 16,
+                  }}
+                >
+                  {likedByMe ? "♥" : "♡"}
+                </button>
+              ) : (
+                <div
+                  aria-hidden="true"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 999,
+                    border: "1px solid #eee",
+                    background: "#fafafa",
+                    display: "grid",
+                    placeItems: "center",
+                    opacity: 0.9,
+                    fontSize: 14,
+                  }}
+                  title="Likes"
+                >
+                  ♥
+                </div>
+              )}
+
+              <div style={{ fontSize: 12, opacity: 0.75, fontWeight: 800 }} title="Likes count">
+                {likeCount}
+              </div>
+
+              {likedByMe && canToggleLike && (
+                <span
+                  style={{
+                    fontSize: 12,
+                    padding: "2px 8px",
+                    borderRadius: 999,
+                    border: "1px solid #ddd",
+                    background: "#fff",
+                    opacity: 0.9,
+                    fontWeight: 800,
+                  }}
+                >
+                  Liked
+                </span>
+              )}
+            </div>
+          )}
+
           {resolvedMenuItems.length > 0 && (
             <>
               <button
