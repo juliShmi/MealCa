@@ -107,5 +107,82 @@ export const mockRecipes = [
     authorId: 'user-2',
     time: 20,
     categories: ['Breakfast', 'Desserts / Sweets']
+  },
+  {
+    id: 'user-3-1',
+    name: 'Tomato Soup',
+    ingredients: [
+      { name: 'tomatoes', amount: 800, unit: 'g' },
+      { name: 'onion', amount: 1, unit: 'pcs' },
+      { name: 'garlic cloves', amount: 2, unit: 'pcs' },
+      { name: 'olive oil', amount: 1, unit: 'tbsp' },
+      { name: 'salt', amount: 1, unit: 'pinch' },
+    ],
+    steps: [
+      'Chop onion and garlic.',
+      'Sauté onion with olive oil until soft.',
+      'Add tomatoes and simmer for 15–20 minutes.',
+      'Blend until smooth and season to taste.',
+    ],
+    authorId: 'user-3',
+    time: 30,
+    categories: ['Soups', 'Home / Traditional']
+  },
+  {
+    id: 'user-3-2',
+    name: 'Veggie Stir Fry',
+    ingredients: [
+      { name: 'broccoli', amount: 250, unit: 'g' },
+      { name: 'carrot', amount: 1, unit: 'pcs' },
+      { name: 'soy sauce', amount: 2, unit: 'tbsp' },
+      { name: 'sesame oil', amount: 1, unit: 'tsp' },
+      { name: 'garlic cloves', amount: 1, unit: 'pcs' },
+    ],
+    steps: [
+      'Cut vegetables into bite-size pieces.',
+      'Stir-fry in a hot pan with a little oil.',
+      'Add garlic, soy sauce, and sesame oil.',
+      'Cook 3–5 minutes and serve.',
+    ],
+    authorId: 'user-3',
+    time: 15,
+    categories: ['Asian', 'Vegetarian / Vegan', 'Dinner']
+  },
+  {
+    id: 'user-4-1',
+    name: 'Tuna Pasta',
+    ingredients: [
+      { name: 'pasta', amount: 250, unit: 'g' },
+      { name: 'canned tuna', amount: 160, unit: 'g' },
+      { name: 'olive oil', amount: 1, unit: 'tbsp' },
+      { name: 'lemon juice', amount: 1, unit: 'tbsp' },
+      { name: 'black pepper', amount: 1, unit: 'pinch' },
+    ],
+    steps: [
+      'Boil pasta until al dente.',
+      'Drain and mix with tuna, olive oil, and lemon juice.',
+      'Season with pepper and serve.',
+    ],
+    authorId: 'user-4',
+    time: 15,
+    categories: ['Pasta', 'Fish / Seafood']
+  },
+  {
+    id: 'user-4-2',
+    name: 'Berry Yogurt Bowl',
+    ingredients: [
+      { name: 'greek yogurt', amount: 250, unit: 'g' },
+      { name: 'berries', amount: 1, unit: 'cup' },
+      { name: 'honey', amount: 1, unit: 'tbsp' },
+      { name: 'granola', amount: 0.5, unit: 'cup' },
+    ],
+    steps: [
+      'Add yogurt to a bowl.',
+      'Top with berries and granola.',
+      'Drizzle with honey.',
+    ],
+    authorId: 'user-4',
+    time: 5,
+    categories: ['Breakfast', 'Desserts / Sweets']
   }
 ];

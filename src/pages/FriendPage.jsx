@@ -33,6 +33,10 @@ function FriendPage({
         return a === String(currentUser?.id) && b === friendId;
       }
 
+      if (f?.status === "following") {
+        return a === String(currentUser?.id) && b === friendId;
+      }
+
       return false;
     });
   }, [friendships, currentUser, friendId]);
