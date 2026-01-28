@@ -23,11 +23,11 @@ function App() {
   const [recipes, setRecipes] = useState(mockRecipes);
   const [categories, setCategories] = useState(mockCategories);
   const [stickers, setStickers] = useState(mockStickers);
-  const [users] = useState(mockUsers);
+  const [users, setUsers] = useState(mockUsers);
   const [friendships, setFriendships] = useState(mockFriendships);
   const [savedRecipes, setSavedRecipes] = useState(mockSavedRecipes);
   const [likes, setLikes] = useState(mockLikes);
-  const [currentUser] = useState(() => mockUsers[0]);
+  const [currentUser, setCurrentUser] = useState(() => mockUsers[0]);
   const [toast, setToast] = useState(null);
 
   const showToast = (message) => {
@@ -206,6 +206,18 @@ function App() {
     showToast('Now you are friends');
   };
 
+  const updateMyNickname = (nickname) => {
+    const next = String(nickname ?? "").trim();
+    if (!next) return;
+    if (next.length > 32) return;
+
+    setCurrentUser((prev) => ({ ...prev, nickname: next }));
+    setUsers((prev) =>
+      (prev ?? []).map((u) => (String(u.id) === String(currentUser.id) ? { ...u, nickname: next } : u)),
+    );
+    showToast("Nickname updated");
+  };
+
   const likesByKey = (() => {
     const map = new Map();
     (likes ?? []).forEach((l) => {
@@ -354,7 +366,7 @@ function App() {
               />
             }
           />
-          <Route path="/user" element={<UserPage user={currentUser} />} />
+          <Route path="/user" element={<UserPage user={currentUser} onUpdateNickname={updateMyNickname} />} />
         </Route>
       </Routes>
     </>
