@@ -12,6 +12,8 @@ function RecipeList({
   currentUser,
   likesByKey,
   onToggleLike,
+  signatureDishRecipeId,
+  onSetSignatureDish,
 }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -152,6 +154,8 @@ function RecipeList({
         currentUserId={currentUser?.id}
         likesByKey={likesByKey}
         onToggleLike={onToggleLike}
+        signatureDishRecipeId={signatureDishRecipeId}
+        onSetSignatureDish={onSetSignatureDish}
         onEdit={
           activeRecipe?.__kind === 'own'
             ? () => navigate(`/recipes/edit/${activeRecipe.id}`)

@@ -13,6 +13,8 @@ function RecipesPage({
   currentUser,
   likesByKey,
   onToggleLike,
+  signatureDishRecipeId,
+  onSetSignatureDish,
 }) {
 
   const addRecipe = (recipe) => {
@@ -49,6 +51,8 @@ function RecipesPage({
     currentUser={currentUser}
     likesByKey={likesByKey}
     onToggleLike={onToggleLike}
+    signatureDishRecipeId={signatureDishRecipeId}
+    onSetSignatureDish={onSetSignatureDish}
   ></Recipes>
 }
 export default RecipesPage;

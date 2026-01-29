@@ -1,8 +1,52 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-function FriendsPage({ currentUser, users = [], friendships = [], onRemoveFriend, onFollow }) {
+function FriendsPage({ currentUser, users = [], friendships = [], recipes = [], onRemoveFriend, onFollow }) {
   const navigate = useNavigate();
+
+  const signatureByUserId = useMemo(() => {
+    const map = new Map();
+    (users ?? []).forEach((u) => {
+      const sigId = u?.signatureDishRecipeId;
+      if (!sigId) {
+        map.set(String(u.id), null);
+        return;
+      }
+      const r =
+        (recipes ?? []).find((x) => String(x.authorId) === String(u.id) && String(x.id) === String(sigId)) ?? null;
+      map.set(String(u.id), r);
+    });
+    return map;
+  }, [users, recipes]);
+
+  const SignatureLine = ({ user }) => {
+    const recipe = signatureByUserId.get(String(user.id)) ?? null;
+    return (
+      <div style={{ marginTop: 2, display: "flex", alignItems: "center", gap: 8, fontSize: 12, opacity: 0.75 }}>
+        <div
+          aria-hidden="true"
+          style={{
+            width: 18,
+            height: 18,
+            borderRadius: 6,
+            border: "1px solid #ddd",
+            background: "#f3f3f3",
+            display: "grid",
+            placeItems: "center",
+            fontWeight: 900,
+            fontSize: 11,
+            color: "#444",
+            flex: "0 0 auto",
+          }}
+        >
+          {recipe ? String(recipe.name ?? "?").slice(0, 1).toUpperCase() : "—"}
+        </div>
+        <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          {recipe ? recipe.name : "Not assigned"}
+        </span>
+      </div>
+    );
+  };
 
   const friends = useMemo(() => {
     const byId = new Map((users ?? []).map((u) => [String(u.id), u]));
@@ -96,6 +140,7 @@ function FriendsPage({ currentUser, users = [], friendships = [], onRemoveFriend
                 <div>
                   <div style={{ fontWeight: 900 }}>{user.nickname}</div>
                   <div style={{ opacity: 0.6, fontSize: 12 }}>{user.id}</div>
+                  <SignatureLine user={user} />
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -159,6 +204,7 @@ function FriendsPage({ currentUser, users = [], friendships = [], onRemoveFriend
                 <div>
                   <div style={{ fontWeight: 900 }}>{user.nickname}</div>
                   <div style={{ opacity: 0.6, fontSize: 12 }}>{user.id}</div>
+                  <SignatureLine user={user} />
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -220,6 +266,7 @@ function FriendsPage({ currentUser, users = [], friendships = [], onRemoveFriend
                 <div>
                   <div style={{ fontWeight: 900 }}>{user.nickname}</div>
                   <div style={{ opacity: 0.6, fontSize: 12 }}>{user.id}</div>
+                  <SignatureLine user={user} />
                 </div>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

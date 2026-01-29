@@ -13,6 +13,8 @@ function ActiveRecipe({
   currentUserId,
   likesByKey,
   onToggleLike,
+  signatureDishRecipeId,
+  onSetSignatureDish,
 }) {
   if (!recipe) return null;
 
@@ -77,6 +79,18 @@ function ActiveRecipe({
     }
 
     return [
+      ...(typeof onSetSignatureDish === "function" && isOwn
+        ? [
+            {
+              key: "signature",
+              label:
+                String(signatureDishRecipeId ?? "") === String(recipe.id)
+                  ? "Signature dish ✓"
+                  : "Make my Signature dish",
+              onClick: () => onSetSignatureDish?.(recipe),
+            },
+          ]
+        : []),
       ...(typeof onEdit === "function" ? [{ key: "edit", label: "Edit", onClick: onEdit }] : []),
       ...(typeof onDelete === "function"
         ? [{ key: "delete", label: "Delete", onClick: onDelete, tone: "danger" }]

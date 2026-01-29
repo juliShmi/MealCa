@@ -6,7 +6,7 @@ import { mockFriendships } from './mocks/mockFriendships'
 import { mockStickers } from './mocks/mockStickers'
 import { mockSavedRecipes } from './mocks/mockSavedRecipes'
 import { mockLikes } from './mocks/mockLikes'
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import Layout from './components/Layout';
 import Toast from './components/Toast';
@@ -39,7 +39,7 @@ function App() {
     ? [SAVED_CATEGORY, ...categories]
     : categories;
 
-  const usersById = new Map((users ?? []).map((u) => [String(u.id), u]));
+  const usersById = useMemo(() => new Map((users ?? []).map((u) => [String(u.id), u])), [users]);
 
   const savedAsRecipeCards = mySavedRecipes.map((sr) => {
     const sourceAuthorId = String(sr.source?.authorId ?? '');
@@ -211,11 +211,42 @@ function App() {
     if (!next) return;
     if (next.length > 32) return;
 
-    setCurrentUser((prev) => ({ ...prev, nickname: next }));
-    setUsers((prev) =>
-      (prev ?? []).map((u) => (String(u.id) === String(currentUser.id) ? { ...u, nickname: next } : u)),
-    );
+    setCurrentUser((prev) => {
+      const myId = String(prev?.id);
+      setUsers((usersPrev) =>
+        (usersPrev ?? []).map((u) => (String(u.id) === myId ? { ...u, nickname: next } : u)),
+      );
+      return { ...prev, nickname: next };
+    });
     showToast("Nickname updated");
+  };
+
+  const setMySignatureDish = (recipe) => {
+    if (!recipe) return;
+    if (recipe.__kind === "saved") return;
+    if (String(recipe.authorId) !== String(currentUser.id)) return;
+
+    const recipeId = String(recipe.id);
+
+    setCurrentUser((prev) => {
+      const myId = String(prev?.id);
+      setUsers((usersPrev) =>
+        (usersPrev ?? []).map((u) => (String(u.id) === myId ? { ...u, signatureDishRecipeId: recipeId } : u)),
+      );
+      return { ...prev, signatureDishRecipeId: recipeId };
+    });
+    showToast("Signature dish updated");
+  };
+
+  const clearMySignatureDish = () => {
+    setCurrentUser((prev) => {
+      const myId = String(prev?.id);
+      setUsers((usersPrev) =>
+        (usersPrev ?? []).map((u) => (String(u.id) === myId ? { ...u, signatureDishRecipeId: null } : u)),
+      );
+      return { ...prev, signatureDishRecipeId: null };
+    });
+    showToast("Signature dish cleared");
   };
 
   const likesByKey = (() => {
@@ -270,6 +301,8 @@ function App() {
             currentUser={currentUser}
             likesByKey={likesByKey}
             onToggleLike={toggleLike}
+            signatureDishRecipeId={currentUser?.signatureDishRecipeId}
+            onSetSignatureDish={setMySignatureDish}
           />
           }
           />}
@@ -302,6 +335,7 @@ function App() {
                 currentUser={currentUser}
                 users={users}
                 friendships={friendships}
+                recipes={recipes}
                 onRemoveFriend={removeFriendToFollower}
                 onFollow={followBack}
               />
@@ -366,7 +400,17 @@ function App() {
               />
             }
           />
-          <Route path="/user" element={<UserPage user={currentUser} onUpdateNickname={updateMyNickname} />} />
+          <Route
+            path="/user"
+            element={
+              <UserPage
+                user={currentUser}
+                recipes={recipes}
+                onUpdateNickname={updateMyNickname}
+                onClearSignatureDish={clearMySignatureDish}
+              />
+            }
+          />
         </Route>
       </Routes>
     </>

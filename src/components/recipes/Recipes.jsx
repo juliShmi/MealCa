@@ -15,6 +15,8 @@ function Recipes({
   currentUser,
   likesByKey,
   onToggleLike,
+  signatureDishRecipeId,
+  onSetSignatureDish,
 }) {
 
   return (
@@ -44,6 +46,8 @@ function Recipes({
             currentUser={currentUser}
             likesByKey={likesByKey}
             onToggleLike={onToggleLike}
+            signatureDishRecipeId={signatureDishRecipeId}
+            onSetSignatureDish={onSetSignatureDish}
           />
         } />
 

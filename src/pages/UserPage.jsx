@@ -1,12 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-function UserPage({ user, onUpdateNickname }) {
+function UserPage({ user, recipes = [], onUpdateNickname, onClearSignatureDish }) {
   if (!user) return null;
 
   const initials = String(user.nickname ?? "?")
     .trim()
     .slice(0, 2)
     .toUpperCase();
+
+  const signatureDish = useMemo(() => {
+    const sigId = user?.signatureDishRecipeId;
+    if (!sigId) return null;
+    return (recipes ?? []).find(
+      (r) => String(r.authorId) === String(user.id) && String(r.id) === String(sigId),
+    ) ?? null;
+  }, [recipes, user?.id, user?.signatureDishRecipeId]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(String(user.nickname ?? ""));
@@ -55,6 +63,51 @@ function UserPage({ user, onUpdateNickname }) {
           </div>
           <div style={{ opacity: 0.7, marginTop: 4 }}>id: {user.id}</div>
         </div>
+      </div>
+
+      <div style={{ marginTop: 18 }}>
+        <div style={{ fontWeight: 900, marginBottom: 8 }}>Signature dish</div>
+        {signatureDish ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              aria-label="Signature dish image placeholder"
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: 10,
+                border: "1px solid #ddd",
+                background: "#f3f3f3",
+                display: "grid",
+                placeItems: "center",
+                fontWeight: 900,
+                color: "#444",
+              }}
+            >
+              {(signatureDish.name ?? "?").slice(0, 1).toUpperCase()}
+            </div>
+            <div style={{ fontWeight: 800 }}>{signatureDish.name}</div>
+            <button
+              type="button"
+              onClick={() => onClearSignatureDish?.()}
+              title="Remove signature dish"
+              aria-label="Remove signature dish"
+              style={{
+                marginLeft: 4,
+                width: 28,
+                height: 28,
+                borderRadius: 999,
+                border: "1px solid #ddd",
+                background: "#fff",
+                cursor: "pointer",
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <div style={{ opacity: 0.65 }}>Not assigned</div>
+        )}
       </div>
 
       {isEditing && (
