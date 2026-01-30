@@ -206,6 +206,15 @@ function App() {
     showToast('Now you are friends');
   };
 
+  const unfollow = (friendId) => {
+    const me = String(currentUser.id);
+    const other = String(friendId);
+    setFriendships((prev) =>
+      (prev ?? []).filter((f) => !(String(f.userId) === me && String(f.friendId) === other && f.status === "following")),
+    );
+    showToast("Unfollowed");
+  };
+
   const updateMyNickname = (nickname) => {
     const next = String(nickname ?? "").trim();
     if (!next) return;
@@ -338,6 +347,7 @@ function App() {
                 recipes={recipes}
                 onRemoveFriend={removeFriendToFollower}
                 onFollow={followBack}
+                onUnfollow={unfollow}
               />
             }
           />
