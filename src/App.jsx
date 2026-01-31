@@ -34,6 +34,52 @@ function App() {
     setToast({ message, key: Date.now() });
   };
 
+  const saveRecipeFromUserToSaved = (recipe, sourceUser) => {
+    if (!recipe) return;
+    const ownerId = String(currentUser.id);
+    const sourceAuthorId = String(sourceUser?.id ?? recipe.authorId);
+    const sourceRecipeId = String(recipe.id);
+
+    let didAdd = false;
+    setSavedRecipes((prev) => {
+      const already = (prev ?? []).some(
+        (sr) =>
+          String(sr.ownerId) === ownerId &&
+          String(sr.source?.authorId) === sourceAuthorId &&
+          String(sr.source?.recipeId) === sourceRecipeId,
+      );
+      if (already) return prev;
+
+      const snapshot = {
+        name: recipe.name,
+        ingredients: recipe.ingredients ?? [],
+        steps: recipe.steps ?? [],
+        time: recipe.time,
+        categories: recipe.categories ?? [],
+      };
+
+      didAdd = true;
+      return [
+        ...(prev ?? []),
+        {
+          id: `saved-${uuidv4()}`,
+          ownerId,
+          source: { authorId: sourceAuthorId, recipeId: sourceRecipeId },
+          savedAt: new Date().toISOString(),
+          notes: "",
+          categoriesOverride: snapshot.categories,
+          snapshot,
+        },
+      ];
+    });
+
+    if (didAdd) {
+      showToast("Recipe saved to your list");
+    } else {
+      showToast("This recipe is already in your Saved");
+    }
+  };
+
   const mySavedRecipes = savedRecipes.filter((sr) => String(sr.ownerId) === String(currentUser.id));
   const categoriesWithSaved = mySavedRecipes.length > 0 && !categories.includes(SAVED_CATEGORY)
     ? [SAVED_CATEGORY, ...categories]
@@ -348,6 +394,7 @@ function App() {
                 onRemoveFriend={removeFriendToFollower}
                 onFollow={followBack}
                 onUnfollow={unfollow}
+                onSaveRecipe={saveRecipeFromUserToSaved}
               />
             }
           />
@@ -362,51 +409,7 @@ function App() {
                 categories={categories}
                 likesByKey={likesByKey}
                 onToggleLike={toggleLike}
-                onSaveRecipe={(recipe, friendUser) => {
-                  if (!recipe) return;
-                  const ownerId = String(currentUser.id);
-                  const sourceAuthorId = String(friendUser?.id ?? recipe.authorId);
-                  const sourceRecipeId = String(recipe.id);
-
-                  let didAdd = false;
-                  setSavedRecipes((prev) => {
-                    const already = prev.some(
-                      (sr) =>
-                        String(sr.ownerId) === ownerId &&
-                        String(sr.source?.authorId) === sourceAuthorId &&
-                        String(sr.source?.recipeId) === sourceRecipeId,
-                    );
-                    if (already) return prev;
-
-                    const snapshot = {
-                      name: recipe.name,
-                      ingredients: recipe.ingredients ?? [],
-                      steps: recipe.steps ?? [],
-                      time: recipe.time,
-                      categories: recipe.categories ?? [],
-                    };
-
-                    didAdd = true;
-                    return [
-                      ...prev,
-                      {
-                        id: `saved-${uuidv4()}`,
-                        ownerId,
-                        source: { authorId: sourceAuthorId, recipeId: sourceRecipeId },
-                        savedAt: new Date().toISOString(),
-                        notes: "",
-                        categoriesOverride: snapshot.categories,
-                        snapshot,
-                      },
-                    ];
-                  });
-
-                  if (didAdd) {
-                    showToast('Recipe saved to your list');
-                  } else {
-                    showToast('This recipe is already in your Saved');
-                  }
-                }}
+                onSaveRecipe={saveRecipeFromUserToSaved}
               />
             }
           />

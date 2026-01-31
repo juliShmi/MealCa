@@ -1,9 +1,20 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import RecipeModal from "../components/calendar/RecipeModal";
 
-function FriendsPage({ currentUser, users = [], friendships = [], recipes = [], onRemoveFriend, onFollow, onUnfollow }) {
+function FriendsPage({
+  currentUser,
+  users = [],
+  friendships = [],
+  recipes = [],
+  onRemoveFriend,
+  onFollow,
+  onUnfollow,
+  onSaveRecipe,
+}) {
   const navigate = useNavigate();
   const [tab, setTab] = useState("friends"); // friends | followers | following
+  const [sigModal, setSigModal] = useState({ isOpen: false, recipe: null, user: null });
 
   const signatureByUserId = useMemo(() => {
     const map = new Map();
@@ -23,7 +34,30 @@ function FriendsPage({ currentUser, users = [], friendships = [], recipes = [], 
   const SignatureLine = ({ user }) => {
     const recipe = signatureByUserId.get(String(user.id)) ?? null;
     return (
-      <div style={{ marginTop: 2, display: "flex", alignItems: "center", gap: 8, fontSize: 12, opacity: 0.75 }}>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!recipe) return;
+          setSigModal({ isOpen: true, recipe, user });
+        }}
+        disabled={!recipe}
+        title={recipe ? "View signature dish" : undefined}
+        aria-label={recipe ? `View ${user.nickname}'s signature dish` : undefined}
+        style={{
+          marginTop: 2,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          fontSize: 12,
+          opacity: 0.85,
+          padding: 0,
+          border: "none",
+          background: "transparent",
+          textAlign: "left",
+          cursor: recipe ? "pointer" : "default",
+        }}
+      >
         <div
           aria-hidden="true"
           style={{
@@ -45,7 +79,7 @@ function FriendsPage({ currentUser, users = [], friendships = [], recipes = [], 
         <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {recipe ? recipe.name : "Not assigned"}
         </span>
-      </div>
+      </button>
     );
   };
 
@@ -329,6 +363,23 @@ function FriendsPage({ currentUser, users = [], friendships = [], recipes = [], 
           )}
         </>
       )}
+
+      <RecipeModal
+        isOpen={sigModal.isOpen}
+        recipe={sigModal.recipe}
+        onClose={() => setSigModal({ isOpen: false, recipe: null, user: null })}
+        primaryAction={
+          sigModal.recipe && sigModal.user && typeof onSaveRecipe === "function"
+            ? {
+                label: "Add to Saved",
+                onClick: () => {
+                  onSaveRecipe?.(sigModal.recipe, sigModal.user);
+                  setSigModal({ isOpen: false, recipe: null, user: null });
+                },
+              }
+            : null
+        }
+      />
     </div>
   );
 }

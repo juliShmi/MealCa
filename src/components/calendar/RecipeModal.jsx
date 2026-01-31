@@ -1,6 +1,6 @@
 import { normalizeIngredients } from "../../utils/ingredients";
 
-function RecipeModal({ isOpen, recipe, onClose }) {
+function RecipeModal({ isOpen, recipe, onClose, primaryAction }) {
   if (!isOpen || !recipe) return null;
 
   const formatTime = (minutes) => {
@@ -94,6 +94,18 @@ function RecipeModal({ isOpen, recipe, onClose }) {
                 <li key={idx}>{step}</li>
               ))}
             </ol>
+          </div>
+        )}
+
+        {primaryAction && (
+          <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end", gap: 8 }}>
+            <button
+              type="button"
+              onClick={() => primaryAction?.onClick?.()}
+              disabled={primaryAction?.disabled}
+            >
+              {primaryAction.label}
+            </button>
           </div>
         )}
       </div>
